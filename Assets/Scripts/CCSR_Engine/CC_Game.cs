@@ -23,12 +23,15 @@ public class CC_Game
     public CC_Sound.GameSound sound;
     public CC_Inventory.GameInventory inventory;
     public CC_Camera camera;
+    public GameObject worldContainer, sceneContainer;
+    public CC_SpriteGame backgroundSprite;
+
 
     public enum EngineType
     {
         CCSR,
         Scooby
-            //
+          
     }
     public EngineType engineType;
     public static float[,] getMapOffset(string mapName)

@@ -8,19 +8,19 @@ public class CC_SpriteGame : MonoBehaviour
     public Sprite spriteData;
     public SpriteRenderer spriteRenderer;
     public Button spriteButton;
-    public CC_SpriteGame(Sprite image, SpriteRenderer renderer, Button button = null)
+    public CC_SpriteGame(Sprite image)
     {
         spriteData = image;
-        spriteRenderer = renderer;
-        spriteButton = button;
+        spriteRenderer = this.gameObject.AddComponent<SpriteRenderer>();
+        spriteButton = this.gameObject.AddComponent<Button>();
         spriteRenderer.sprite = spriteData;
 
     }
     public CC_SpriteGame()
     {
         spriteData = null;
-        spriteRenderer = null;
-        spriteButton = null;
+        spriteRenderer = this.gameObject.AddComponent<SpriteRenderer>();
+        spriteButton = this.gameObject.AddComponent<Button>();
     }
     public void SetSprite(Sprite image)
     {
@@ -30,6 +30,11 @@ public class CC_SpriteGame : MonoBehaviour
     }
     public void SetSpritePos(Vector2 pos)
     {
-        spriteRenderer.transform.position = pos;
+        transform.position = pos;
+    }
+    public void Visible(bool isVisible)
+    {
+        spriteRenderer.enabled = isVisible;
+        spriteButton.enabled = isVisible;
     }
 }

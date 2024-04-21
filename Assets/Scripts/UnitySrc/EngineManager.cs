@@ -12,7 +12,6 @@ public class EngineManager : MonoBehaviour
      * load
      * intro
      * script
-     * sign
      * scene
      * Manager
      */

@@ -20,7 +20,7 @@ public class CC_SpriteUI : MonoBehaviour
     public CC_SpriteUI()
     {
         spriteData = null;
-        spriteRenderer = null;
+        spriteRenderer = this.gameObject.AddComponent<Image>();
         spriteButton = this.gameObject.AddComponent<Button>();
         spriteButton.interactable = false;
         this.transform.SetParent(EngineManager.instance.mainCanvas.transform);
@@ -39,7 +39,7 @@ public class CC_SpriteUI : MonoBehaviour
     }
     public void SetSpritePos(Vector2 pos)
     {
-        spriteRenderer.transform.position = pos;
+        transform.position = pos;
     }
 }
 

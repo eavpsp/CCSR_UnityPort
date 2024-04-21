@@ -126,13 +126,13 @@ public class CC_Player : MovableGameObject
     public void init()
     {
         Texture2D newTex = CC_Game.getMemberTexture(this.getTextureString());
-        this.gameSprite = new CC_SpriteGame(Sprite.Create(newTex, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f), EngineManager.instance.CreateObjectRenderer("gameSprite"));
+        this.gameSprite = new CC_SpriteGame(Sprite.Create(newTex, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
 
 
         if (this.game.engineType == CC_Game.EngineType.Scooby)
         {
             Texture2D newScoobTex = CC_Game.getMemberTexture("scooby.down.1");
-            this.scoobySprite = new CC_SpriteGame(Sprite.Create(newScoobTex, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f), EngineManager.instance.CreateObjectRenderer("scoobySprite"));
+            this.scoobySprite = new CC_SpriteGame(Sprite.Create(newScoobTex, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
 
         }
     }

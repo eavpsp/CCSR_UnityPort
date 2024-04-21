@@ -198,11 +198,11 @@ public class CC_Camera
     {
         CC_Types.Rect data = CC_Game.getMapRect(mapName);
 
-        float x = (int)(-data.x * mainCam.rect.size.x);
-        float y = (int)(-data.y * mainCam.rect.size.y);
+        float x = (-data.x * mainCam.rect.size.x);
+        float y = (-data.y * mainCam.rect.size.y);
 
-        float w = (int)(Screen.width * mainCam.rect.width);
-        float h = (int)(Screen.height * mainCam.rect.height);
+        float w = (Screen.width * mainCam.rect.width);
+        float h = (Screen.height * mainCam.rect.height);
 
         float mapWidth = this.mapWidthPixels * this.scaleX;
         float mapHeight = this.mapHeightPixels * this.scaleY;
