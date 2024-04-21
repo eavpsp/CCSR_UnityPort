@@ -28,6 +28,7 @@ public class CC_Game
     {
         CCSR,
         Scooby
+            //
     }
     public EngineType engineType;
     public static float[,] getMapOffset(string mapName)
