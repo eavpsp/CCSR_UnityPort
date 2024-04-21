@@ -361,3 +361,14 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+*.sln
+*.csproj
+/UserSettings
+/Temp
+/ProjectSettings
+/Library
+/ccsr-main
+/Assets/TextMesh Pro
+/Assets/sound
+/Assets/Scenes
+/Assets/images/1
