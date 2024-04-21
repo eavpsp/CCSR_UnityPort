@@ -52,8 +52,8 @@ public class CC_Camera
     }
     public void setScale()
     {
-        int w = (int)(Screen.width * mainCam.rect.width);
-        int h = (int)(Screen.height * mainCam.rect.height);
+        float w = (int)(Screen.width * mainCam.rect.width);
+        float h = (int)(Screen.height * mainCam.rect.height);
         screenWidth = w;
         screenHeight = h;
 
@@ -61,9 +61,9 @@ public class CC_Camera
         mapHeightPixels = (int)rect.height;
         mapWidthPixels = (int)rect.width;
 
-        int scaleX = w / (int)rect.width;
-        int scaleY = h / (int)rect.height;
-        int scale = (w > h) ? scaleY : scaleX;
+        float scaleX = w / (int)rect.width;
+        float scaleY = h / (int)rect.height;
+        float scale = (w > h) ? scaleY : scaleX;
 
         mainCam.rect = new Rect(new Vector2(mainCam.rect.x, mainCam.rect.y),new Vector2(scale, scale));
         scaleX = scale;

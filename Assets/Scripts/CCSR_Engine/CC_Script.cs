@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CC_Script : MonoBehaviour
+public class CC_Script 
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public CC_Game game;
 
-    // Update is called once per frame
-    void Update()
+    public virtual void init() { }
+    public virtual void onNewMap(string nextMap) { }
+
+    CC_Script(CC_Game game)
     {
-        
+        this.game = game;
     }
 }
