@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using static CC_Types;
 
 public class AssetData
 {
@@ -26,6 +27,7 @@ public class EngineManager : MonoBehaviour
     /// </summary>
     public UnityEvent tickEvent;
     //Text Control
+    public List<AssetData> assets;
 
     //Sprite Control
     public SpriteRenderer CreateObjectRenderer(string name)
@@ -34,11 +36,41 @@ public class EngineManager : MonoBehaviour
         SpriteRenderer rend = obj.AddComponent<SpriteRenderer>();
         return rend;
     }
+    public GameMapArea GetGameMapAreaJson(AssetData asset)
+    {
+        GameMapArea data = new GameMapArea();
+        if (asset != null)
+        {
+            JsonUtility.FromJsonOverwrite(asset.path, data);
+        }
+
+        return data;
+    }
+    public GameMessages GetGameMessages(AssetData asset)
+    {
+        GameMessages data = null;
+        if (asset != null)
+        {
+            JsonUtility.FromJsonOverwrite(asset.path, data);
+        }
+
+        return data;
+    }
+    public GameData GetGameData(AssetData asset)
+    {
+        GameData data = null;
+        if (asset != null)
+        {
+            JsonUtility.FromJsonOverwrite(asset.path, data);
+        }
+
+        return data;
+    }
     public void LoadJsonAssets(string episodeNumber, string lang, UnityEvent doneCallBack)
     {
         string root = Application.dataPath + episodeNumber + "/";
-        List<AssetData> assets = new List<AssetData>()
-        {
+        assets = new List<AssetData>{
+
             new AssetData
             {
                 name = "textures",

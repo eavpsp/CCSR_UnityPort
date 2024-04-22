@@ -4,23 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Security.Cryptography;
+using System.Text;
 using static CC_Types;
 
 public class CC_Game 
 {
   
-
     public static float MAP_WIDTH = 416;
     public static float MAP_HEIGHT = 320;
-
     public static float UI_WIDTH_PERCENT = 0.6f;
     public static float UI_HEIGHT_PERCENT = 0.6f;
-
-
     public CC_Player player;
     public List<CC_GameObject> gameObjects = new List<CC_GameObject>();
-    public CC_GameObject[] movingObjects;
-
+    public List<CC_GameObject> movingObjects = new List<CC_GameObject>();
     public float numMapsX = 0;
     public float numMapsY = 0;
     public CC_Types.Rect worldRect;
@@ -36,12 +33,9 @@ public class CC_Game
     public List<FilmLoopData> filmLoopData = new List<FilmLoopData>();
     private Dictionary<string, CC_Scene.GameScene> scenes = new Dictionary<string, CC_Scene.GameScene>();
     private CC_Scene.GameScene currentScene;
-
     public float targetFps = 13;
     public float MSperTick = 1000 / 13;
-
     private float lastUpdate = DateTime.Now.Millisecond;
-
     public bool smoothAnimations = true;
     public GameData gameData;
     public float ratio = 416 / 320;
@@ -62,12 +56,10 @@ public class CC_Game
         this.introScreen = new CC_Intro(episode);
 
     }
-
-    public void addScene(string name, CC_Scene scene)
+    public void addScene(string name, CC_Scene.GameScene scene)
     {
         this.scenes.Add(name, new CC_Scene.GameScene(this));
     }
-
     public void closeScene()
     {
         if (this.currentScene != null)
@@ -166,7 +158,6 @@ public class CC_Game
         }
     }
 }
-
     public static float[,] getMapOffset(string mapName)
     {
         float xIndex = float.Parse(mapName.Substring(0, 2));
@@ -185,36 +176,214 @@ public class CC_Game
         return new CC_Types.Pos((xIndex) - 1, (yIndex) - 1);
 
     }
+    public void setMap(string mapName)
+    {
+        this.currentMap = mapName;
+    }
+    public string getMap()
+    {
+        return this.currentMap;
+    }
+    private void drawObjectToBackground(CC_GameObject obj)
+    {
+        this.backgroundSprite = obj.sprite;
+        this.backgroundSprite.Visible(true);
+         
+    }
+    private void init(string episode)
+    {
+    
+        this.player.init();
+        this.initObjects();
+        this.initWorldInfo();
+        //scripts
+        switch (episode)
+        {
+            case "2":
+                this.script = new Episode2(this);
+                break;
+            case "3":
+                this.script = new Episode3(this);
+                break;
+            case "4":
+                this.script = new Episode4(this);
+                break;
+            case "scooby-1":
+                this.script = new Scooby1(this);
+                break;
+            case "scooby-2":
+                this.script = new Scooby2(this);
+                break;
+            default:
+                this.script = new CC_Episode1(this);
+                break;
+        }
+        this.script.init();
+        this.initRenderObjects();
 
+        
+        this.sign.init();
+        this.inventory.init();
+
+        this.gameData = EngineManager.instance.GetGameData(EngineManager.instance.assets.Find(x => x.name == "game")); 
+
+        if (this.engineType == EngineType.CCSR)
+            this.inventory.initItems(this.gameData!.inventory);
+
+       /* this.app.renderer.addListener("resize", () => {
+            this.resize();
+        });*/
+
+       
+
+        this.introScreen.init(this);
+    }
+    //
+    private void initObjects()
+    {
+
+        List<GameMapArea> data = new List<GameMapArea>();
+        EngineManager.instance.assets.ForEach((x) =>
+        {
+            if (x.name == "map")
+            {
+                data.Add(EngineManager.instance.GetGameMapAreaJson(x));
+            }
+        });
+        List<GameMessages> messages = new List<GameMessages>();
+        EngineManager.instance.assets.ForEach((x) =>
+        {
+            if (x.name == "messagaes")
+            {
+                messages.Add(EngineManager.instance.GetGameMessages(x));
+            }
+        });
+        // Convert all objects in map data to GameObjects
+        foreach(GameMapArea area in data) {
+            // Do not load unused maps.
+            // They have a suffix and are longer than 4 characters
+            if (area.name.Length > 4)
+            {
+                continue;
+            }
+
+            foreach(IGameObject obj in area.data) {
+                // Either the parser is bugged or there is a bug in the map data
+                // for episode 2, there's an object which is bad. Skip past it.
+                if (obj.member == null)
+                {
+                    continue;
+                }
+
+                // Replace the message text with the translation for the chosen language
+                if (messages != null)
+                {
+                    foreach(GameObjectMessage msg in obj.data.message) {
+                        byte[] msgBytes = Encoding.UTF8.GetBytes(msg.text);
+                        byte[] hashBytes;
+                        string msgHash = "";
+                        using (SHA256 sha256 = SHA256.Create())
+                        {
+                            hashBytes = sha256.ComputeHash(msgBytes);
+                        };
+                         msgHash = BitConverter.ToString(hashBytes).Replace("-", "").Substring(0, msg.text.Length);
+
+                        foreach (GameMessages mesg in messages)
+                        {
+                            msg.text = mesg[msgHash].ToString();
+                        }
+                      
+                    }
+                }
+
+                CC_GameObject gameObject = new CC_GameObject(obj, area.name);
+                this.gameObjects.Add(gameObject);
+            }
+        }
+    }
+    private void initRenderObjects()
+    {
+       
+        this.gameObjects.Reverse();
+
+        this.updateAllVisibility();
+
+       
+        this.movingObjects = this.gameObjects.FindAll(obj => obj.data.move.COND == GameObjectMoveCond.AUTO);
+
+        Debug.Log("Game objects: " + this.gameObjects.Count);
+       
+    }
+    private void initWorldInfo()
+    {
+        HashSet<string> mapSet = new HashSet<string>();
+        foreach (var obj in gameObjects)
+        {
+            mapSet.Add(obj.mapName);
+        }
+
+        int xMax = mapSet.Select(s => int.Parse(s.Substring(0, 2))).Max();
+        int yMax = mapSet.Select(s => int.Parse(s.Substring(2, 2))).Max();
+
+        numMapsX = xMax;
+        numMapsY = yMax;
+
+        worldRect = new CC_Types.Rect
+        {
+            x = 0,
+            y = 0,
+            width = numMapsX * MAP_WIDTH,
+            height = numMapsY * MAP_HEIGHT
+        };
+    }
     public static Texture2D getMemberTexture(string memeberName, string subFolder = "character.visuals")
-    {
-        // Load the PNG file from the specified file path
-        string name = memeberName.ToLower();
-        name = name + ".png";
-        name = name.Replace(".x",".");
+        {
+            // Load the PNG file from the specified file path
+            string name = memeberName.ToLower();
+            name = name + ".png";
+            name = name.Replace(".x",".");
 
-        //get translation sata
-        byte[] fileData = System.IO.File.ReadAllBytes(Application.dataPath +"/images/" + subFolder +"/"+ name);
+            //get translation sata
+            byte[] fileData = System.IO.File.ReadAllBytes(Application.dataPath +"/images/" + subFolder +"/"+ name);
 
-        // Create a new Texture2D
-        Texture2D texture = new Texture2D(2, 2);
-        texture.LoadImage(fileData); // Load the image data into the texture
+            // Create a new Texture2D
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(fileData); // Load the image data into the texture
 
-        return texture;
-    }
-
+            return texture;
+        }
     public  static CC_Types.Rect getMapRect(string mapName) 
-    {
-      CC_Types.Pos offset = getMapOffset(mapName, 0);
-      return new CC_Types.Rect { 
-        x = offset.x* MAP_WIDTH,
-        y = offset.y* MAP_HEIGHT,
-        width = MAP_WIDTH,
-        height = MAP_HEIGHT,
-      };
-    }
+        {
+          CC_Types.Pos offset = getMapOffset(mapName, 0);
+          return new CC_Types.Rect { 
+            x = offset.x* MAP_WIDTH,
+            y = offset.y* MAP_HEIGHT,
+            width = MAP_WIDTH,
+            height = MAP_HEIGHT,
+          };
+        }
+    public static CC_Types.Rect getMapsRect(string topLeft, string bottomRight){
+        CC_Types.Rect TL = getMapRect(topLeft);
+        CC_Types.Rect BR = getMapRect(bottomRight);
 
-    public void setFilmLoopObjects()
+        float xs =
+          int.Parse(bottomRight.Substring(0, 2)) - int.Parse(topLeft.Substring(0, 2)) + 1;
+        float ys =
+          int.Parse(bottomRight.Substring(2, 4)) - int.Parse(topLeft.Substring(2, 4)) + 1;
+
+        float width = xs * TL.width;
+        float height = ys * TL.height;
+
+        CC_Types.Rect result = new CC_Types.Rect{
+        x= TL.x,
+        y= TL.y,
+        width = 0,
+        height = 0,
+    };
+    
+    return result;
+}
+public void setFilmLoopObjects()
     {
         foreach(var obj in gameObjects)
         {
@@ -236,7 +405,6 @@ public class CC_Game
     {
         return (int)Mathf.Floor(UnityEngine.Random.Range(0, 1) * (max - min + 1) + min);
     }
-
     public void updateAllVisibility()
     {
         foreach (CC_GameObject obj in gameObjects)
@@ -245,7 +413,6 @@ public class CC_Game
         }
         
     }
-
     private void updateVisibility(CC_GameObject obj)
     {
         bool showObj = false;
@@ -291,7 +458,6 @@ public class CC_Game
 
         obj.setVisible(showObj);
     }
-
     private void updateFilmLoopObjects()
     {
         FilmLoop filmLoop;
@@ -327,7 +493,6 @@ public class CC_Game
 
         });
     }
-
     private Pos posAfterDeltaMove(CC_GameObject obj, float dx, float dy) 
     {
         CC_Types.Rect pos = obj.getRect();
@@ -336,7 +501,6 @@ public class CC_Game
         return new Pos(newX, newY);
  
   }
-
     private bool canMoveGameObject(CC_GameObject gameObj, Pos toPos)
     {
         CC_Types.Rect newRect = new CC_Types.Rect

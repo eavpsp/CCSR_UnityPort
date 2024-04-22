@@ -41,10 +41,10 @@ public static class CC_Types
 
     public class GameData
     {
-        string walkIntoWater;
-        string noItems;
-        GameMessages scene;
-        GameInventoryItemData[] inventory;
+        public string walkIntoWater;
+        public string noItems;
+        public GameMessages scene;
+        public List<GameInventoryItemData> inventory = new List<GameInventoryItemData>();
     }
 
     public interface GameMessages

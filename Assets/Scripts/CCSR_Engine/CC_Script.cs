@@ -8,8 +8,11 @@ public class CC_Script
 
     public virtual void init() { }
     public virtual void onNewMap(string nextMap) { }
+    public CC_Script()
+    {
 
-    CC_Script(CC_Game game)
+    }
+    public CC_Script(CC_Game game)
     {
         this.game = game;
     }
