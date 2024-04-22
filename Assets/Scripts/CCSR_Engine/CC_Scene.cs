@@ -19,7 +19,7 @@ public class CC_Scene
         public UnityEvent callback;
     }
 
-    public abstract class GameScene
+    public class GameScene
     {
         protected CC_Game game;
 

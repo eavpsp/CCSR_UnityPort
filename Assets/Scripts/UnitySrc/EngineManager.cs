@@ -20,8 +20,13 @@ public class EngineManager : MonoBehaviour
     public static EngineManager instance;
     public AudioSource SFX, BGM;
     public Canvas mainCanvas;
+    //UNITY
+    /// <summary>
+    ///  Functions to bridge to unity functionality
+    /// </summary>
+    public UnityEvent tickEvent;
     //Text Control
-    
+
     //Sprite Control
     public SpriteRenderer CreateObjectRenderer(string name)
     {
@@ -72,6 +77,9 @@ public class EngineManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        tickEvent.Invoke();
+       
+        //Run Controls Callbacks here
     }
+    //
 }

@@ -52,7 +52,7 @@ public class CC_GameObject : IGameObject, MovableGameObject
         get => _gdata; set => _gdata = value;
     }
 
-    readonly string mapName;
+    public readonly string mapName;
     readonly float mapOffsetX;
     readonly float mapOffsetY;
 
@@ -65,10 +65,10 @@ public class CC_GameObject : IGameObject, MovableGameObject
     private bool visible = true;
     public GameObject baseObj;
     public CC_SpriteGame sprite;
-    private float speed = 8;
+    public float speed = 8;
     private bool inWalkingAnimation = false;
     private float walkAnimStartMS = 0;
-    private Pos lastPos, nextPos;
+    public Pos lastPos, nextPos;
     float MovableGameObject.speed
         {
             get
@@ -125,7 +125,7 @@ public class CC_GameObject : IGameObject, MovableGameObject
 
  
 
-    public int moveDirection = -1;
+    public float moveDirection = -1;
     public Pos movePos = new Pos(0,0);
       
 

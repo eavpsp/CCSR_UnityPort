@@ -21,8 +21,8 @@ public static class CC_Types
 
     public class FilmLoopTexture
     {
-        string[] loopTextures;
-        float delay;
+        public string[] loopTextures;
+        public float delay;
     }
 
     public delegate void FilmLoopCallback(CC_GameObject gameObject);
