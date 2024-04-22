@@ -126,13 +126,14 @@ public class CC_Player : MovableGameObject
     public void init()
     {
         Texture2D newTex = CC_Game.getMemberTexture(this.getTextureString());
-        this.gameSprite = new CC_SpriteGame(Sprite.Create(newTex, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
-
+        this.gameSprite = new GameObject("player").AddComponent<CC_SpriteGame>();
+        this.gameSprite.SetSprite(Sprite.Create(newTex, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
 
         if (this.game.engineType == CC_Game.EngineType.Scooby)
         {
             Texture2D newScoobTex = CC_Game.getMemberTexture("scooby.down.1");
-            this.scoobySprite = new CC_SpriteGame(Sprite.Create(newScoobTex, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
+            this.scoobySprite = new GameObject("scooby").AddComponent<CC_SpriteGame>();
+            this.scoobySprite.SetSprite(Sprite.Create(newScoobTex, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
 
         }
     }
@@ -149,7 +150,7 @@ public class CC_Player : MovableGameObject
     {
         this.posX = x;
         this.posY = y;
-        this.baseObject.transform.position = new Vector2(this.posX, this.posY);
+        this.gameSprite.transform.position = new Vector2(this.posX, this.posY);
 
     }
 
@@ -197,7 +198,7 @@ public class CC_Player : MovableGameObject
     }
 
     public Pos getPosition() {
-        return new Pos(posX, posY);
+        return new Pos(this.gameSprite.transform.position.x, this.gameSprite.transform.position.y);
 
     }
     public void setMapAndPosition(string map, int xIndex, int yIndex)
@@ -328,9 +329,12 @@ public class CC_Player : MovableGameObject
 
     public void refreshTexture()
     {
-        string texStr = this.getTextureString();
-        Texture2D texture = CC_Game.getMemberTexture(texStr);
-        this.gameSprite.SetSprite(Sprite.Create(texture, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(texture.width, texture.height)), Vector2.one * 0.5f));
+        if (this.gameSprite.spriteData == null)
+        {
+            string texStr = this.getTextureString();
+            Texture2D texture = CC_Game.getMemberTexture(texStr);
+            this.gameSprite.SetSprite(Sprite.Create(texture, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(texture.width, texture.height)), Vector2.one * 0.5f));
+        }
 
     }
     private bool scoobyCanMove(CC_Types.Rect thisRect)

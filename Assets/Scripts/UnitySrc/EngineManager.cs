@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -21,6 +23,8 @@ public class EngineManager : MonoBehaviour
     public static EngineManager instance;
     public AudioSource SFX, BGM;
     public Canvas mainCanvas;
+    public CC_Game currentGame;
+    public string episode;
     //UNITY
     /// <summary>
     ///  Functions to bridge to unity functionality
@@ -29,6 +33,17 @@ public class EngineManager : MonoBehaviour
     //Text Control
     public List<AssetData> assets;
 
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            DestroyImmediate(this.gameObject);
+        }
+    }
     //Sprite Control
     public SpriteRenderer CreateObjectRenderer(string name)
     {
@@ -36,15 +51,31 @@ public class EngineManager : MonoBehaviour
         SpriteRenderer rend = obj.AddComponent<SpriteRenderer>();
         return rend;
     }
-    public GameMapArea GetGameMapAreaJson(AssetData asset)
+    public GameMapArea GetGameMapAreaJson(string mapName)
     {
         GameMapArea data = new GameMapArea();
-        if (asset != null)
+        string root = Application.dataPath + "/game/" + EngineManager.instance.episode + "/map.data/";
+        string jsonString = File.ReadAllText(root + mapName + ".txt");
+        try
         {
-            JsonUtility.FromJsonOverwrite(asset.path, data);
+           
+            JsonUtility.FromJsonOverwrite(jsonString, data);
+        }
+        catch (ArgumentException ex)
+        {
+            Debug.LogError("Error parsing JSON: " + ex.Message);
+            Debug.LogError("Problematic JSON string: " + jsonString);
         }
 
         return data;
+    }
+    public CC_SpriteGame GenerateGameSprite(string name)
+    {
+        return new GameObject(name).AddComponent<CC_SpriteGame>();
+    }
+    public CC_SpriteUI GenerateUISprite(string name)
+    {
+        return new GameObject(name).AddComponent<CC_SpriteUI>();
     }
     public GameMessages GetGameMessages(AssetData asset)
     {
@@ -58,17 +89,17 @@ public class EngineManager : MonoBehaviour
     }
     public GameData GetGameData(AssetData asset)
     {
-        GameData data = null;
-        if (asset != null)
-        {
-            JsonUtility.FromJsonOverwrite(asset.path, data);
-        }
+        GameData data = new GameData();
+        string jsonString = File.ReadAllText(asset.path);
+        
+        JsonUtility.FromJsonOverwrite(jsonString, data);
+        
 
         return data;
     }
-    public void LoadJsonAssets(string episodeNumber, string lang, UnityEvent doneCallBack)
+    public void LoadJsonAssets(string episodeNumber, string lang, Action doneCallBack)
     {
-        string root = Application.dataPath + episodeNumber + "/";
+        string root = Application.dataPath + "/game/" + episodeNumber + "/";
         assets = new List<AssetData>{
 
             new AssetData
@@ -84,12 +115,17 @@ public class EngineManager : MonoBehaviour
              new AssetData
             {
                 name = "map",
-                path = root + "map" + episodeNumber + ".json"
+                path = root + "map.data" + ".txt"
             },
               new AssetData
             {
                 name = "game",
-                path = root + lang + "/messages.json"
+                path = root + lang + "/game.json"
+            },
+                 new AssetData
+            {
+                name = "message",
+                path = root + lang + "/message.json"
             },
         };
         if (lang != "en")
@@ -100,10 +136,12 @@ public class EngineManager : MonoBehaviour
                 path = root + lang + "/ep" + episodeNumber + ".json",
             });
         }
+        doneCallBack();
     }
     void Start()
     {
-        
+        episode = "1";
+        currentGame = new CC_Game(episode, "en");
     }
 
     // Update is called once per frame

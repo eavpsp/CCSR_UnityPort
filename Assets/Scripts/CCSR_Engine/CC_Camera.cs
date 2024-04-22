@@ -37,6 +37,7 @@ public class CC_Camera
     {
         Camera mainCam = Camera.main;
         this.game = game;
+        EngineManager.instance.tickEvent.AddListener(this.tick);
         this.cameraBounds = new CC_Types.Rect
         {
             height = 0,
@@ -44,6 +45,7 @@ public class CC_Camera
             x = 0,
             y = 0,
         };
+        
     }
     public void setCameraMode(CameraMode mode)
     {
@@ -52,8 +54,12 @@ public class CC_Camera
     }
     public void setScale()
     {
-        float w = (int)(Screen.width * mainCam.rect.width);
-        float h = (int)(Screen.height * mainCam.rect.height);
+        if (mainCam == null)
+        {
+            mainCam = Camera.main;
+        }
+        float w = (int)(Screen.width);
+        float h = (int)(Screen.height);
         screenWidth = w;
         screenHeight = h;
 
@@ -79,16 +85,14 @@ public class CC_Camera
         {
             return;
         }
-        // disable player movement while panning
+     
         this.game.player.SetStatus(PlayerStatus.STOP);
 
         this.isPanning = true;
-        //const lastPos = this.getMapCameraXY(fromMap);
-        //this.currentCameraPos = lastPos;
+       
         CC_Types.Pos lastPos = this.currentCameraPos;
         this.nextCameraPos = this.getMapCameraXY(nextMap);
-        // console.log(lastPos, this.nextCameraPos);
-        //console.log("from", this.currentCameraPos, "to", this.nextCameraPos);
+       
 
         float deltaX = this.nextCameraPos.x - lastPos.x;
 
@@ -102,19 +106,21 @@ public class CC_Camera
     }
     public void centerCameraOnPlayer()
     {
+        Debug.Break();
+
         CC_Types.Pos pos = this.game.player.getPosition();
 
-        float pX = -pos.x * this.scaleX;
-        float pY = -pos.y * this.scaleY;
+        int pX = (int)(-pos.x * this.scaleX);
+        int pY = (int)(-pos.y * this.scaleY);
 
-        float width = (int)(Screen.width * mainCam.rect.width);
-        float height = (int)(Screen.height * mainCam.rect.height);
+        int width = (int)(Screen.width);
+        int height = (int)(Screen.height);
 
-        float hW = (int)(Mathf.Round(width / 2));
-        float hH = (int)(Mathf.Round(height / 2));
+        int hW = (int)(Mathf.Round(width / 2));
+        int hH = (int)(Mathf.Round(height / 2));
 
-        float cX = pX + hW;
-        float cY = pY + hH;
+        int cX = pX + hW;
+        int cY = pY + hH;
 
         /*
         const bounds = this.cameraBounds;
@@ -152,7 +158,7 @@ public class CC_Camera
             {
                 this.isPanning = false;
                 this.game.player.SetStatus(PlayerStatus.MOVE);
-                this.setCamera(this.nextCameraPos.x, this.nextCameraPos.y);
+                this.setCamera((int)this.nextCameraPos.x, (int)this.nextCameraPos.y);
                 this.currentCameraPos = this.nextCameraPos;
                 return;
             }
@@ -164,7 +170,7 @@ public class CC_Camera
             float dy = percentage * (this.nextCameraPos.y - this.currentCameraPos.y);
 
             CC_Types.Pos p = this.nextCameraPos;
-            this.setCamera(p.x - dx, p.y - dy);
+            this.setCamera((int)(p.x - dx), (int)(p.y - dy));
             return;
         }
     }
@@ -179,7 +185,7 @@ public class CC_Camera
         CC_Types.Pos pos = this.getMapCameraXY(mapName);
         
         this.currentCameraPos = pos;
-        this.setCamera(pos.x, pos.y);
+        this.setCamera((int)pos.x, (int)pos.y);
     }
     public void setCameraBounds(string mapTopLeft, string mapBottomRight)
     {
@@ -201,8 +207,8 @@ public class CC_Camera
         float x = (-data.x * mainCam.rect.size.x);
         float y = (-data.y * mainCam.rect.size.y);
 
-        float w = (Screen.width * mainCam.rect.width);
-        float h = (Screen.height * mainCam.rect.height);
+        float w = (Screen.width);
+        float h = (Screen.height);
 
         float mapWidth = this.mapWidthPixels * this.scaleX;
         float mapHeight = this.mapHeightPixels * this.scaleY;
@@ -255,8 +261,9 @@ public class CC_Camera
             return new CC_Types.Pos(newX,newY);
   }
 
-    private void setCamera(float x, float y)
+    private void setCamera(int x, int y)
     {
-        this.mainCam.transform.position = new Vector2(x, y);
+        Debug.Log("X: "+ x+ " Y: "+ y);
+        this.mainCam.transform.position = new Vector3(x, y, -10);
     }
 }

@@ -7,20 +7,16 @@ public class CC_SpriteGame : MonoBehaviour
 {
     public Sprite spriteData;
     public SpriteRenderer spriteRenderer;
-    public Button spriteButton;
-    public CC_SpriteGame(Sprite image)
-    {
-        spriteData = image;
-        spriteRenderer = this.gameObject.AddComponent<SpriteRenderer>();
-        spriteButton = this.gameObject.AddComponent<Button>();
-        spriteRenderer.sprite = spriteData;
 
-    }
-    public CC_SpriteGame()
+
+    private void Awake()
     {
-        spriteData = null;
-        spriteRenderer = this.gameObject.AddComponent<SpriteRenderer>();
-        spriteButton = this.gameObject.AddComponent<Button>();
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = this.gameObject.AddComponent<SpriteRenderer>();
+
+        }
+        
     }
     public void SetSprite(Sprite image)
     {
@@ -35,6 +31,6 @@ public class CC_SpriteGame : MonoBehaviour
     public void Visible(bool isVisible)
     {
         spriteRenderer.enabled = isVisible;
-        spriteButton.enabled = isVisible;
+  
     }
 }

@@ -45,8 +45,8 @@ public class CC_Scene
         public void resize()
         {
             Camera mainCam = Camera.main;
-            float w = (Screen.width * mainCam.rect.width);
-            float h = (Screen.height * mainCam.rect.height);
+            float w = (Screen.width);
+            float h = (Screen.height);
             this.container.transform.localScale = new Vector2(this.game.camera.scaleX, this.game.camera.scaleY);
             float x = (w - 416 * this.container.transform.localScale.x) / 2;
             float y = (h - 320 * this.container.transform.localScale.y) / 2;

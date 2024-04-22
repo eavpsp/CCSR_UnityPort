@@ -62,43 +62,42 @@ public class CC_Sound
     public class GameSound
     {
             
-        public CC_AudioFile walk;
-        public CC_AudioFile boat;
-        public CC_AudioFile bump;
-        public CC_AudioFile push;
-        public CC_AudioFile chimes;
-        public CC_AudioFile message;
-        public CC_AudioFile secret;
-        public CC_AudioFile correct;
-        public CC_AudioFile incorrect;
-        public CC_AudioFile click;
-        public CC_AudioFile win;
-        public CC_AudioFile lose;
+        public CC_AudioFile walk = new CC_AudioFile();
+        public CC_AudioFile boat = new CC_AudioFile();
+        public CC_AudioFile bump = new CC_AudioFile();
+        public CC_AudioFile push = new CC_AudioFile();
+        public CC_AudioFile chimes = new CC_AudioFile();
+        public CC_AudioFile message = new CC_AudioFile();
+        public CC_AudioFile secret = new CC_AudioFile();
+        public CC_AudioFile correct = new CC_AudioFile();
+        public CC_AudioFile incorrect = new CC_AudioFile();
+        public CC_AudioFile click = new CC_AudioFile();
+        public CC_AudioFile win = new CC_AudioFile();
+        public CC_AudioFile lose = new CC_AudioFile();
 
         // Episode 1:
-        public CC_AudioFile pop;
-        public CC_AudioFile water;
-        public CC_AudioFile squeak;
+        public CC_AudioFile pop = new CC_AudioFile();
+        public CC_AudioFile water = new CC_AudioFile();
+        public CC_AudioFile squeak = new CC_AudioFile();
 
         // Episode 2:
-        public CC_AudioFile robot;
-        public CC_AudioFile headPop;
-        public CC_AudioFile headBounce;
-        public CC_AudioFile alarm;
+        public CC_AudioFile robot = new CC_AudioFile();
+        public CC_AudioFile headPop = new CC_AudioFile();
+        public CC_AudioFile headBounce = new CC_AudioFile();
+        public CC_AudioFile alarm = new CC_AudioFile();
 
         // Episode 3:
-        public CC_AudioFile rumble;
-        public CC_AudioFile volcano;
+        public CC_AudioFile rumble = new CC_AudioFile();
+        public CC_AudioFile volcano = new CC_AudioFile();
 
         // Episode 4:
-        public CC_AudioFile crowd;
-        public CC_AudioFile disco;
-
-        private CC_AudioFile theme;
-        private CC_AudioFile theme1;
-        private CC_AudioFile theme2;
+        public CC_AudioFile crowd = new CC_AudioFile();
+        public CC_AudioFile disco = new CC_AudioFile();
+        private CC_AudioFile theme = new CC_AudioFile();
+        private CC_AudioFile theme1 = new CC_AudioFile();
+        private CC_AudioFile theme2 = new CC_AudioFile();
         private int themeSelect = 1;
-        private CC_AudioFile currentTheme;
+        private CC_AudioFile currentTheme = new CC_AudioFile();
 
         private CC_Game.EngineType engine;
         private string root;
@@ -109,40 +108,40 @@ public class CC_Sound
         {
             //load in game audio as audio clips to be stored
             this.engine = engine;
-            string root = Application.dataPath+"/sounds/";
+            string root = Application.dataPath+"/game/" + episode +"/sound/";
             this.root = root;
-            this.walk.soundClip = CC_Sound.LoadWavFile("walk.wav", 0);
+            this.walk.soundClip = CC_Sound.LoadWavFile(root + "walk.wav", 0);
             this.walk.loop = true;
             soundBank.Add("walk", walk);
-            this.push.soundClip = CC_Sound.LoadWavFile("push.wav", 0);
+            this.push.soundClip = CC_Sound.LoadWavFile(root + "push.wav", 0);
             this.push.loop = true;
             soundBank.Add("push", push);
-            this.boat.soundClip = CC_Sound.LoadWavFile("boat.wav", 0);
+            this.boat.soundClip = CC_Sound.LoadWavFile(root + "boat.wav", 0);
             this.boat.loop = true;
             soundBank.Add("boat", boat);
-            this.bump.soundClip = CC_Sound.LoadWavFile("bump.wav", 0);
+            this.bump.soundClip = CC_Sound.LoadWavFile(root + "bump.wav", 0);
             soundBank.Add("bump", bump);
-            this.chimes.soundClip = CC_Sound.LoadWavFile("chimes.wav", 0);
+            this.chimes.soundClip = CC_Sound.LoadWavFile(root + "chimes.wav", 0);
             soundBank.Add("chimes", chimes);
-            this.message.soundClip = CC_Sound.LoadWavFile("message.wav", 0);
+            this.message.soundClip = CC_Sound.LoadWavFile(root + "message.wav", 0);
             soundBank.Add("message", message);
-            this.secret.soundClip = CC_Sound.LoadWavFile("discover.wav", 0);
+            this.secret.soundClip = CC_Sound.LoadWavFile(root + "discover.wav", 0);
             soundBank.Add("secret", secret);
-            this.correct.soundClip = CC_Sound.LoadWavFile("correct.wav", 0);
+            this.correct.soundClip = CC_Sound.LoadWavFile(root + "correct.wav", 0);
             soundBank.Add("correct", correct);
-            this.incorrect.soundClip = CC_Sound.LoadWavFile("incorrect.wav", 0);
+            this.incorrect.soundClip = CC_Sound.LoadWavFile(root + "incorrect.wav", 0);
             soundBank.Add("incorrect", incorrect);
-            this.click.soundClip = CC_Sound.LoadWavFile("click.wav", 0);
+            this.click.soundClip = CC_Sound.LoadWavFile(root + "click.wav", 0);
             soundBank.Add("click", click);
-            this.win.soundClip = CC_Sound.LoadWavFile("win.wav", 0);
+            this.win.soundClip = CC_Sound.LoadWavFile(root + "win.wav", 0);
             soundBank.Add("win", win);
-            this.lose.soundClip = CC_Sound.LoadWavFile("lose.wav", 0);
+            this.lose.soundClip = CC_Sound.LoadWavFile(root + "lose.wav", 0);
             soundBank.Add("lose", lose);
-            this.theme.soundClip = CC_Sound.LoadWavFile("theme.main.wav", 0);
+            this.theme.soundClip = CC_Sound.LoadWavFile(root + "theme.main.wav", 0);
             soundBank.Add("theme", theme);
-            this.theme1.soundClip = CC_Sound.LoadWavFile("theme.change.1.wav", 0);
+            this.theme1.soundClip = CC_Sound.LoadWavFile(root + "theme.change.1.wav", 0);
             soundBank.Add("theme1", theme1);
-            this.theme2.soundClip = CC_Sound.LoadWavFile("theme.change.2.wav", 0);
+            this.theme2.soundClip = CC_Sound.LoadWavFile(root + "theme.change.2.wav", 0);
             soundBank.Add("theme2", theme2);
 
 
@@ -150,10 +149,10 @@ public class CC_Sound
             // Episode 1
             if (episode == "1")
             {
-                this.pop.soundClip = CC_Sound.LoadWavFile("pop.wav", 0);
-                this.water.soundClip = CC_Sound.LoadWavFile("water.wav", 0);
+                this.pop.soundClip = CC_Sound.LoadWavFile(root + "pop.wav", 0);
+                this.water.soundClip = CC_Sound.LoadWavFile(root + "water.wav", 0);
                 this.water.loop = true;
-                this.squeak.soundClip = CC_Sound.LoadWavFile("squeak.wav", 0);
+                this.squeak.soundClip = CC_Sound.LoadWavFile(root + "squeak.wav", 0);
                 this.squeak.loop = true;
                 soundBank.Add("pop", pop);
                 soundBank.Add("water", water);
@@ -164,11 +163,11 @@ public class CC_Sound
             // Episode 2
             if (episode == "2")
             {
-                this.robot.soundClip = CC_Sound.LoadWavFile("robot.wav", 0);
+                this.robot.soundClip = CC_Sound.LoadWavFile(root + "robot.wav", 0);
                 this.robot.loop = true;
-                this.headBounce.soundClip = CC_Sound.LoadWavFile("headBounce.wav", 0);
-                this.headPop.soundClip = CC_Sound.LoadWavFile("headPop.wav", 0);
-                this.alarm.soundClip = CC_Sound.LoadWavFile("alarm.wav", 0);
+                this.headBounce.soundClip = CC_Sound.LoadWavFile(root + "headBounce.wav", 0);
+                this.headPop.soundClip = CC_Sound.LoadWavFile(root + "headPop.wav", 0);
+                this.alarm.soundClip = CC_Sound.LoadWavFile(root + "alarm.wav", 0);
                 this.alarm.loop = true;
                 soundBank.Add("robot", robot);
                 soundBank.Add("headBounce", headBounce);
@@ -179,9 +178,9 @@ public class CC_Sound
             // Episode 3
             if (episode == "3")
             {
-                this.rumble.soundClip = CC_Sound.LoadWavFile("rumble.wav", 0);
+                this.rumble.soundClip = CC_Sound.LoadWavFile(root + "rumble.wav", 0);
                 this.rumble.loop = true;
-                this.volcano.soundClip = CC_Sound.LoadWavFile("volcano.wav", 0);
+                this.volcano.soundClip = CC_Sound.LoadWavFile(root + "volcano.wav", 0);
                 soundBank.Add("rumble", rumble);
                 soundBank.Add("volcano", volcano);
             }
@@ -190,9 +189,9 @@ public class CC_Sound
             if (episode == "4")
             {
 
-                this.crowd.soundClip = CC_Sound.LoadWavFile("crowd.wav", 0);
+                this.crowd.soundClip = CC_Sound.LoadWavFile(root + "crowd.wav", 0);
                 this.crowd.loop = true;
-                this.disco.soundClip = CC_Sound.LoadWavFile("disco.wav", 0);
+                this.disco.soundClip = CC_Sound.LoadWavFile(root + "disco.wav", 0);
                 this.disco.loop = true;
                 soundBank.Add("crowd", crowd);
                 soundBank.Add("disco", disco);
@@ -218,7 +217,7 @@ public class CC_Sound
              {
                
                     CC_AudioFile audioFile = new CC_AudioFile();
-                    audioFile.soundClip = CC_Sound.LoadWavFile(sound + ".wav", 0);
+                    audioFile.soundClip = CC_Sound.LoadWavFile(root + sound + ".wav", 0);
                     audioFile.loop = loops.Contains(sound);
                     soundBank.Add(sound, audioFile);
             }
@@ -265,6 +264,7 @@ public class CC_Sound
         }
         public IEnumerator GetNextTheme() 
         {
+            playTheme();
             while (EngineManager.instance.BGM.isPlaying)
             {
                 yield return null;
@@ -288,14 +288,16 @@ public class CC_Sound
 
                 }
             }
-            initTheme();
+            EngineManager.instance.StartCoroutine(GetNextTheme());
         }
 
         private void initTheme()
         {
             this.currentTheme = this.theme;
             SetBGMClip(currentTheme);
-        
+           
+
+
             if (this.engine == CC_Game.EngineType.CCSR)
             {
                 EngineManager.instance.StartCoroutine(GetNextTheme());

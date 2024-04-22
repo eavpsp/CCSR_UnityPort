@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -65,7 +66,7 @@ public static class CC_Types
         Pos nextPos { get; set; }
     }
 
-    public class Pos
+    public struct Pos
     {
         public Pos(float _x, float _y)
         {
@@ -83,11 +84,10 @@ public static class CC_Types
         public float width;
         public float height;
     }
-
-    public  class GameMapArea
+    [Serializable]
+    public class GameMapArea
     {
-        public string name;
-        public int roomID;
+        public string roomID;
         public int roomStatus;
         public IGameObject[] data;
     }
@@ -102,16 +102,16 @@ public static class CC_Types
         WATER, //= "WATER",
     }
 
-    public interface IGameObject
+    public class IGameObject
     {
-        string member { get; set; }
-        GameObjectType type { get; set; }
-        float[,] location { get; set; }
-        float width { get; set; }
-        float height { get; set; }
-        float WSHIFT { get; set; }
-        float HSHIFT { get; set; }
-        GameObjectData data { get; set; }
+        public string member { get; set; }
+        public GameObjectType type { get; set; }
+        public float[,] location { get; set; }
+        public float width { get; set; }
+        public float height { get; set; }
+        public float WSHIFT { get; set; }
+        public float HSHIFT { get; set; }
+        public GameObjectData data { get; set; }
     }
 
     public class GameObjectData

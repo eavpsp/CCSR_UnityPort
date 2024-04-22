@@ -17,15 +17,21 @@ public class CC_Sign
 
     private UnityEvent onCloseCallback;
     private float scale = 1;
-
+        
+    
     public CC_Sign(CC_Game game, CC_Game.EngineType engine)
     {
         this.engine = engine;
         this.game = game;
+        this.textElement = new GameObject("textElement_Sign").AddComponent<TextMeshProUGUI>();
+        this.textElement.transform.SetParent(EngineManager.instance.mainCanvas.transform);
         this.textElement.text = "";
         this.adaptiveScale = true;
-        this.sprite = new CC_SpriteUI();
-        this.characterSprite = new CC_SpriteUI();
+        this.sprite = new GameObject("sign_sprite").AddComponent<CC_SpriteUI>();
+        this.sprite.transform.SetParent(EngineManager.instance.mainCanvas.transform);
+        this.characterSprite = new GameObject("char sprite").AddComponent<CC_SpriteUI>();
+        this.sprite.transform.SetParent(EngineManager.instance.mainCanvas.transform);
+
     }
     public bool isOpen()
     {
@@ -37,8 +43,8 @@ public class CC_Sign
     }
     public void init()
     {
-        Texture2D spriteTexture = CC_Game.getMemberTexture("sign.bkg");
-        this.sprite.spriteData = Sprite.Create(spriteTexture, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(spriteTexture.width, spriteTexture.height)), Vector2.one * 0.5f);
+        Texture2D spriteTexture = CC_Game.getMemberTexture("sign.bkg.png", "message.visuals");
+        this.sprite.SetSprite(Sprite.Create(spriteTexture, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(spriteTexture.width, spriteTexture.height)), Vector2.one * 0.5f));
         this.sprite.Visible(true);
         this.sprite.spriteButton.onClick.AddListener(delegate
         {
@@ -58,8 +64,8 @@ public class CC_Sign
         this.isCharacterMessage = false;
         this.isMessageShowing = true;
         this.setTextDimensions(true);
-        Texture2D spriteTexture = CC_Game.getMemberTexture("sign.bkg");
-        this.sprite.spriteData = Sprite.Create(spriteTexture, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(spriteTexture.width, spriteTexture.height)), Vector2.one * 0.5f);
+        Texture2D spriteTexture = CC_Game.getMemberTexture("sign.bkg.png", "message.visuals");
+        this.sprite.SetSprite(Sprite.Create(spriteTexture, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(spriteTexture.width, spriteTexture.height)), Vector2.one * 0.5f));
         this.sprite.Visible(true);
         this.textElement.text = message;
 
@@ -114,17 +120,13 @@ public class CC_Sign
           "I see you, poking around in the developer console";
         
 
-        if (this.onCloseCallback.GetPersistentEventCount() > 0)
-        {
-            this.onCloseCallback.Invoke();
-            this.onCloseCallback.RemoveAllListeners();
-        }
+       
     }
     public void resize()
     {
         Camera mainCam = Camera.main;
-        float width = (Screen.width * mainCam.rect.width);
-        float height = (Screen.height * mainCam.rect.height);
+        float width = (Screen.width);
+        float height = (Screen.height);
         float x = Mathf.Round(width / 2);
         float y = Mathf.Round(height / 2);
         this.sprite.SetSpritePos(new Vector2(x, y));

@@ -57,14 +57,14 @@ public static class CC_Inventory
         public List<string> selection = new List<string>();
         public List<string> banned = new List<string>();
 
-        GameInventory(CC_Game game, CC_Game.EngineType engine)
+        public GameInventory(CC_Game game, CC_Game.EngineType engine)
         {
             this.game = game;
             this.engine = engine;
-            this.sprite = new CC_SpriteUI();
-            this.spriteInstructions = new CC_SpriteUI();
-            this.spriteSelectedItem = new CC_SpriteUI();
-           
+            this.sprite = new GameObject("inven_Sprite").AddComponent<CC_SpriteUI>();
+            this.spriteInstructions = new GameObject("instru").AddComponent<CC_SpriteUI>();
+            this.spriteSelectedItem = new GameObject("selec").AddComponent<CC_SpriteUI>();
+            this.textElement = new GameObject("invetText").AddComponent<TextMeshProUGUI>();
             this.sprite.spriteButton.interactable = true;
             this.sprite.spriteButton.onClick.AddListener(delegate
             {
@@ -248,7 +248,8 @@ public static class CC_Inventory
             var mappedItems = items.FindAll(item => {
                 int index = getItemIndex(item);
                 Texture2D newTex = CC_Game.getMemberTexture(item + ".png");
-                CC_SpriteUI itemSprite = new CC_SpriteUI(Sprite.Create(newTex, new UnityEngine.Rect(new Vector2(0,0), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
+                CC_SpriteUI itemSprite = new GameObject(item).AddComponent<CC_SpriteUI>();
+                itemSprite.SetSprite(Sprite.Create(newTex, new UnityEngine.Rect(new Vector2(0,0), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
                 itemSprite.SetSpritePos(new Vector2(points[index].center.x, points[index].center.y));
                 itemSprite.spriteRenderer.enabled = true;
                 itemSprite.spriteButton.interactable = true;
@@ -322,14 +323,16 @@ public static class CC_Inventory
         public void init()
         {
             this.banned.Add("getanimal");
-            Texture2D newTex = CC_Game.getMemberTexture("inventory");
-            this.sprite = new CC_SpriteUI(Sprite.Create(newTex, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
+            Texture2D newTex = CC_Game.getMemberTexture("inventory.png", "inventory.visuals");
+            this.sprite = new GameObject("inventory").AddComponent<CC_SpriteUI>();
+            this.sprite.SetSprite((Sprite.Create(newTex, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f)));
             this.sprite.Visible(false);
 
             this.originalHeight = (int)this.sprite.spriteData.rect.height;
             this.originalWidth = (int)this.sprite.spriteData.rect.width;
-            Texture2D newTexSI = CC_Game.getMemberTexture("inventory.instruct");
-            this.spriteInstructions = new CC_SpriteUI(Sprite.Create(newTexSI, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(newTexSI.width, newTexSI.height)), Vector2.one * 0.5f));
+            Texture2D newTexSI = CC_Game.getMemberTexture("inventory.instruct.png", "inventory.visuals");
+            this.spriteInstructions = new GameObject("instructions").AddComponent<CC_SpriteUI>();
+            this.spriteInstructions.SetSprite(Sprite.Create(newTexSI, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(newTexSI.width, newTexSI.height)), Vector2.one * 0.5f));
             this.spriteInstructions.Visible(true);
 
             // this.spriteInstructions.buttonMode = true;
@@ -339,16 +342,21 @@ public static class CC_Inventory
                 this.closeInventory();
             });
 
-            Texture2D newTexSII = CC_Game.getMemberTexture("inventory.square");
-            this.spriteSelectedItem = new CC_SpriteUI(Sprite.Create(newTexSII, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(newTexSII.width, newTexSII.height)), Vector2.one * 0.5f));
+            Texture2D newTexSII = CC_Game.getMemberTexture("inventory.square.png", "inventory.visuals");
+            this.spriteSelectedItem = new GameObject("selected").AddComponent<CC_SpriteUI>();
+            this.spriteSelectedItem.SetSprite(Sprite.Create(newTexSII, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(newTexSII.width, newTexSII.height)), Vector2.one * 0.5f));
             this.spriteSelectedItem.Visible(false);
 
+            if (EngineManager.instance.episode == "4")
+            {
+                Texture2D girlTex = CC_Game.getMemberTexture("end.girls.order.png", "end.sequence");
+                this.girlOrder = new GameObject("girlOrder").AddComponent<CC_SpriteUI>();
+                this.girlOrder.SetSprite(Sprite.Create(girlTex, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(girlTex.width, girlTex.height)), Vector2.one * 0.5f));
+                this.girlOrder.SetSpritePos(new Vector2(0, -160));
+                this.girlOrder.Visible(false);
+            }
 
-
-            Texture2D girlTex = CC_Game.getMemberTexture("end.girls.order");
-            this.girlOrder = new CC_SpriteUI(Sprite.Create(girlTex, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(girlTex.width, girlTex.height)), Vector2.one * 0.5f));
-            this.girlOrder.SetSpritePos(new Vector2(0, -160));
-            this.girlOrder.Visible(false);
+           
 
             
 
@@ -370,8 +378,8 @@ public static class CC_Inventory
             
 
             
-                this.onCloseCallback.Invoke();
-                this.onCloseCallback.RemoveAllListeners();
+                //this.onCloseCallback.Invoke();
+                
             
         }
         
@@ -401,8 +409,8 @@ public static class CC_Inventory
         public void resize()
         {
             Camera mainCam = Camera.main;
-            float width = (Screen.width * mainCam.rect.width);
-            float height = (Screen.height * mainCam.rect.height);
+            float width = (Screen.width );
+            float height = (Screen.height);
             float x = Mathf.Round(width / 2);
             float y = Mathf.Round(height / 2);
             this.sprite.SetSpritePos(new Vector2(x, y));

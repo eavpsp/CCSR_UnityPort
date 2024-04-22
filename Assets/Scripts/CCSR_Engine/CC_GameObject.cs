@@ -207,7 +207,8 @@ and have the engine update the textures of those every frame.
             this.width = 16;
            
         }
-        this.sprite = new CC_SpriteGame(Sprite.Create(objTexture, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(width, height)), Vector2.one * 0.5f));
+        this.sprite = EngineManager.instance.GenerateGameSprite(this.member);
+        this.sprite.SetSprite(Sprite.Create(objTexture, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(width, height)), Vector2.one * 0.5f));
         sprite.SetSpritePos(new Vector2(this.posX, this.posY));
 
     }

@@ -8,24 +8,21 @@ public class CC_SpriteUI : MonoBehaviour
     public Sprite spriteData;
     public Image spriteRenderer;
     public Button spriteButton;
-    public CC_SpriteUI(Sprite image)
+    private void Awake()
     {
-        spriteData = image;
-        spriteRenderer = this.gameObject.AddComponent<Image>();
-        spriteButton = this.gameObject.AddComponent<Button>();
-        spriteButton.interactable = false;
-        spriteRenderer.sprite = spriteData;
-        this.transform.SetParent(EngineManager.instance.mainCanvas.transform);
-    }
-    public CC_SpriteUI()
-    {
-        spriteData = null;
-        spriteRenderer = this.gameObject.AddComponent<Image>();
-        spriteButton = this.gameObject.AddComponent<Button>();
-        spriteButton.interactable = false;
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = this.gameObject.AddComponent<Image>();
+            
+        }
+        if (spriteButton == null)
+        {
+            spriteButton = this.gameObject.AddComponent<Button>();
+        }
         this.transform.SetParent(EngineManager.instance.mainCanvas.transform);
 
     }
+   
     public void Visible(bool isVisible)
     {
         spriteRenderer.enabled = isVisible;
