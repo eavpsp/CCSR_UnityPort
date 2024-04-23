@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.ComponentModel;
 using static CC_Inventory;
 public static class CC_Types 
 {
@@ -39,6 +40,7 @@ public static class CC_Types
         FilmLoop this[string key] { get; set; }
     }
 
+    [Serializable]
 
     public class GameData
     {
@@ -47,10 +49,11 @@ public static class CC_Types
         public GameMessages scene;
         public List<GameInventoryItemData> inventory = new List<GameInventoryItemData>();
     }
+    
 
-    public interface GameMessages
+    public class GameMessages
     {
-        GameMessages this[string key] { get;set; }
+        public string message;
     }
     public delegate void setPosition(int x, int y);
     public delegate void initMove(Pos fromPos, Pos toPos);
@@ -59,7 +62,7 @@ public static class CC_Types
     public interface MovableGameObject
     {
 
-        float speed { get; set; }
+        int speed { get; set; }
          bool inWalkingAnimation { get; set; }
         float walkAnimStartMS { get; set; }
         Pos lastPos { get; set; }
@@ -68,51 +71,92 @@ public static class CC_Types
 
     public struct Pos
     {
-        public Pos(float _x, float _y)
+        public Pos(int _x, int _y)
         {
             x = _x;
             y = _y;
         }
-       public float x;
-        public float y;
+        public int x;
+        public int y;
     }
 
     public class Rect
     {
-        public float x;
-        public float y;
-        public float width;
-        public float height;
+        public int x;
+        public int y;
+        public int width;
+        public int height;
     }
     [Serializable]
     public class GameMapArea
     {
+        public IGameObject[] data;
         public string roomID;
         public int roomStatus;
-        public IGameObject[] data;
+        public string name;
+
+    }
+    [Serializable]
+
+    public class GameMapAreaDataContainer
+    {
+        public List<GameMapArea> data = new List<GameMapArea>();
     }
 
-    public  enum GameObjectType
+    [Serializable]
+
+    public enum GameObjectType
     {
+        [Description("FLOR")]
         FLOR,// = "FLOR",
+        [Description("WALL")]
+
         WALL, //= "WALL",
+        [Description("CHAR")]
+
         CHAR, //= "char",
+        [Description("ITEM")]
+
         ITEM, //= "item",
+        [Description("DOOR")]
+
+
         DOOR, //= "DOOR",
+        [Description("WATER")]
+
         WATER, //= "WATER",
     }
+    public static string GetDescription(this Enum value)
+    {
+        var field = value.GetType().GetField(value.ToString());
+        var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+        return attribute == null ? value.ToString() : attribute.Description;
+    }
+    [Serializable]
+    public class Location
+    {
+        public int x { get; set; }
+        public int y { get; set; }
 
+        public Location(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+    }
+    [Serializable]
     public class IGameObject
     {
-        public string member { get; set; }
-        public GameObjectType type { get; set; }
-        public float[,] location { get; set; }
-        public float width { get; set; }
-        public float height { get; set; }
-        public float WSHIFT { get; set; }
-        public float HSHIFT { get; set; }
-        public GameObjectData data { get; set; }
+        public string member;
+        public string type;
+        public int[] location = new int[2];
+        public int width;
+        public int WSHIFT;
+        public int height;
+        public int HSHIFT;
+        public GameObjectData data;
     }
+    [Serializable]
 
     public class GameObjectData
     {
@@ -120,22 +164,23 @@ public static class CC_Types
         public GameObjectMove move;
         public GameObjectMessage[] message;
     }
+    [Serializable]
 
     public class GameObjectMessage
     {
+        public string text;
         public string plrAct;
         public string plrObj;
-        public string text;
     }
-
+    [Serializable]
     public class GameObjectItem
     {
         public string name;
-        public GameObjectType type;
+        public string type;
         public GameObjectVisibility visi;
-        public GameObjectCond[] COND;
+        public GameObjectCond[] COND = new GameObjectCond[4];
     }
-
+    [Serializable]
     public class GameObjectCond
     {
         public string hasObj;
@@ -143,17 +188,19 @@ public static class CC_Types
         public string giveObj;
         public string giveAct;
     }
+    [Serializable]
 
     public class GameObjectMove
     {
-       public int U;
+        public int U;
         public int D;
         public int L;
         public int R;
         public GameObjectMoveCond COND ;
-        public float TIMEA;
-        public float TIMEB;
+        public int TIMEA;
+        public int TIMEB;
 }
+    [Serializable]
 
     public enum GameObjectMoveCond
     {
@@ -166,6 +213,7 @@ public static class CC_Types
         // MOVEX
         // MOVEY
     }
+    [Serializable]
 
     public class GameObjectVisibility
     {
@@ -173,9 +221,13 @@ public static class CC_Types
         public string visiAct;
         public string inviObj;
         public string inviAct;
-        public string VALUE
+        private string VALUE
         {
             get { return this.visiObj + this.visiAct + this.inviObj + this.inviAct; }
+        }
+        public string getValue()
+        {
+            return VALUE;
         }
     }
 

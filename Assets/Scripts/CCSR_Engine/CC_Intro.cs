@@ -44,9 +44,9 @@ public class CC_Intro
     }
     public void resize(CC_Game game)
     {
-        Camera mainCam = Camera.main;
-        float w = (Screen.width );
-        float h = (Screen.height );
+        
+        float w = (Screen.width);
+        float h = (Screen.height);
         if (this.message.spriteData != null)
         {
             if (w > h)

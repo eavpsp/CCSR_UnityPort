@@ -20,6 +20,8 @@ public class EngineManager : MonoBehaviour
      * game
      * Manager
      */
+   
+
     public static EngineManager instance;
     public AudioSource SFX, BGM;
     public Canvas mainCanvas;
@@ -51,23 +53,13 @@ public class EngineManager : MonoBehaviour
         SpriteRenderer rend = obj.AddComponent<SpriteRenderer>();
         return rend;
     }
-    public GameMapArea GetGameMapAreaJson(string mapName)
+   
+    public GameMapAreaDataContainer GetGameMapAreaJson(AssetData asset)
     {
-        GameMapArea data = new GameMapArea();
-        string root = Application.dataPath + "/game/" + EngineManager.instance.episode + "/map.data/";
-        string jsonString = File.ReadAllText(root + mapName + ".txt");
-        try
-        {
-           
-            JsonUtility.FromJsonOverwrite(jsonString, data);
-        }
-        catch (ArgumentException ex)
-        {
-            Debug.LogError("Error parsing JSON: " + ex.Message);
-            Debug.LogError("Problematic JSON string: " + jsonString);
-        }
-
-        return data;
+        GameMapAreaDataContainer areas = new GameMapAreaDataContainer();
+        string jsonString = File.ReadAllText(asset.path);
+        JsonUtility.FromJsonOverwrite(jsonString, areas);
+        return areas;
     }
     public CC_SpriteGame GenerateGameSprite(string name)
     {
@@ -77,12 +69,13 @@ public class EngineManager : MonoBehaviour
     {
         return new GameObject(name).AddComponent<CC_SpriteUI>();
     }
-    public GameMessages GetGameMessages(AssetData asset)
+    public List<GameMessages> GetGameMessages(AssetData asset)
     {
-        GameMessages data = null;
+        List<GameMessages> data = new List<GameMessages>();
         if (asset != null)
         {
-            JsonUtility.FromJsonOverwrite(asset.path, data);
+            string jsonString = File.ReadAllText(asset.path);
+            JsonUtility.FromJsonOverwrite(jsonString, data);
         }
 
         return data;
@@ -115,7 +108,7 @@ public class EngineManager : MonoBehaviour
              new AssetData
             {
                 name = "map",
-                path = root + "map.data" + ".txt"
+                path = root + "map" + episodeNumber + ".json"
             },
               new AssetData
             {
@@ -140,6 +133,7 @@ public class EngineManager : MonoBehaviour
     }
     void Start()
     {
+       
         episode = "1";
         currentGame = new CC_Game(episode, "en");
     }

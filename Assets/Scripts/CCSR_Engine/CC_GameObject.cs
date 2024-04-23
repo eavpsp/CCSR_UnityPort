@@ -11,7 +11,7 @@ using static CC_Types;
  * whether they are used or not, the structure
  * of every object in the game is the same.
  */
-
+[Serializable]
 public class CC_GameObject : IGameObject, MovableGameObject
 {
     public static readonly int[,] MOVE_DIRECTIONS =
@@ -25,26 +25,27 @@ public class CC_GameObject : IGameObject, MovableGameObject
     public string member {
         get => _member; set => _member = value;
     }
-    private float[,] _location;
-    public GameObjectType type {
-        get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); 
+    private int[] _location;
+    private string _Type;
+    public string type {
+        get => _Type; set => _Type = value; 
     }
-    public float[,] location {
+    public int[] location {
         get => _location; set => _location = value; 
     }
-    private float _width;
-    public float width {
+    private int _width;
+    public int width {
         get => _width; set => _width = value; 
     }
-    private float _height;
-    public float height {
+    private int _height;
+    public int height {
         get => _height; set => _height = value;
     }
-    private float _wshift, _hshift;
-    public float WSHIFT {
+    private int _wshift, _hshift;
+    public int WSHIFT {
         get => _wshift; set => _wshift = value;
     }
-    public float HSHIFT {
+    public int HSHIFT {
         get => _hshift; set => _hshift = value;
     }
     private GameObjectData _gdata;
@@ -53,23 +54,23 @@ public class CC_GameObject : IGameObject, MovableGameObject
     }
 
     public readonly string mapName;
-    readonly float mapOffsetX;
-    readonly float mapOffsetY;
+    readonly int mapOffsetX;
+    readonly int mapOffsetY;
 
-    public float posX;
-    public float posY;
+    public int posX;
+    public int posY;
 
-    public readonly float originalPosX;
-    public readonly float originalPosY;
+    public readonly int originalPosX;
+    public readonly int originalPosY;
 
     private bool visible = true;
     public GameObject baseObj;
     public CC_SpriteGame sprite;
-    public float speed = 8;
+    public int speed = 8;
     private bool inWalkingAnimation = false;
     private float walkAnimStartMS = 0;
     public Pos lastPos, nextPos;
-    float MovableGameObject.speed
+    int MovableGameObject.speed
         {
             get
             {
@@ -125,7 +126,7 @@ public class CC_GameObject : IGameObject, MovableGameObject
 
  
 
-    public float moveDirection = -1;
+    public int moveDirection = -1;
     public Pos movePos = new Pos(0,0);
       
 
@@ -151,13 +152,13 @@ and have the engine update the textures of those every frame.
         this.HSHIFT = obj.HSHIFT;
         this.data = obj.data;
         this.mapName = mapName;
-        float[,] offset = CC_Game.getMapOffset(this.mapName);
-        this.mapOffsetX = offset[0, 0]; // Access the element at row 0, column 0
-        this.mapOffsetY = offset[0, 1]; // Access the element at row 0, column 1
-        float offsetX = this.mapOffsetX * 32 * 13;
-        float offsetY = this.mapOffsetY * 32 * 10;
-        this.posX = this.location[0, 0] * 16 + offsetX + this.WSHIFT;
-        this.posY = this.location[0, 1] * 16 + offsetY + this.HSHIFT;
+        int[] offset = CC_Game.getMapOffset(this.mapName);
+        this.mapOffsetX = offset[0]; // Access the element at row 0, column 0
+        this.mapOffsetY = offset[1]; // Access the element at row 0, column 1
+        int offsetX = this.mapOffsetX * 32 * 13;
+        int offsetY = this.mapOffsetY * 32 * 10;
+        this.posX = this.location[0] * 16 + offsetX + this.WSHIFT;
+        this.posY = this.location[1] * 16 + offsetY + this.HSHIFT;
         if (!this.member.Contains("tile"))
         {
             this.posX -= (int)Mathf.Round(this.width / 2);
@@ -182,33 +183,39 @@ and have the engine update the textures of those every frame.
         this.nextPos = this.lastPos;
         this.movePos = this.lastPos;
 
-        Texture2D objTexture = CC_Game.getMemberTexture(this.member);
 
         // make  this object a tiling sprite if it includes "tile"
         // and the width/height is bigger than the texture
 
+        Texture2D objTexture;
 
-
+        this.sprite = new GameObject(member).AddComponent<CC_SpriteGame>();
         if (this.member.ToLower().Contains("tile"))
         {
             string tileRepeat = this.member.ToLower();
 
             sprite.spriteRenderer.drawMode = SpriteDrawMode.Tiled;
+            objTexture = CC_Game.getMemberTexture(this.member + ".png", "map.tiles");
 
         }
+        else
+        {
+            
+             objTexture = CC_Game.getMemberTexture(this.member +".png", "map.visuals");
 
+        }
 
         // HACK to fix ocean walls on the north eastern side
         // of the maps in episodes 2-4
         // they spill over into other levels, so they need to be adjusted
-        if (this.member.Contains("tile.1.x") && this.data.item.type == GameObjectType.WALL)
+        if (this.member.Contains("tile.1.x") && this.data.item.type == GameObjectType.WALL.GetDescription())
         {
-            sprite.SetSpritePos(new Vector2(baseObj.transform.position.x - 16, baseObj.transform.position.y));
+            sprite.SetSpritePos(new Vector2(sprite.transform.position.x - 16, sprite.transform.position.y));
             this.width = 16;
            
         }
         this.sprite = EngineManager.instance.GenerateGameSprite(this.member);
-        this.sprite.SetSprite(Sprite.Create(objTexture, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(width, height)), Vector2.one * 0.5f));
+        this.sprite.SetSprite(Sprite.Create(objTexture, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(objTexture.width, objTexture.height)), Vector2.one * 0.5f));
         sprite.SetSpritePos(new Vector2(this.posX, this.posY));
 
     }
@@ -238,11 +245,11 @@ and have the engine update the textures of those every frame.
 
         int t = 16;
 
-        float top = this.originalPosY - move.U * t;
-        float bottom = this.originalPosY + this.height + move.D * t;
+        int top = this.originalPosY - move.U * t;
+        int bottom = this.originalPosY + this.height + move.D * t;
 
-        float left = this.originalPosX - move.L * t;
-        float right = this.originalPosX + this.width + move.R * t;
+        int left = this.originalPosX - move.L * t;
+        int right = this.originalPosX + this.width + move.R * t;
 
         CC_Types.Rect bounds = new CC_Types.Rect {
             x= left,
@@ -293,10 +300,10 @@ and have the engine update the textures of those every frame.
     public bool isStatic()
     {
         // Always include these types of objects' sprites in the scene
-        List <GameObjectType> dynamicTypes = new List<GameObjectType>
+        List <string> dynamicTypes = new List<string>
         {
-            GameObjectType.CHAR, // characters
-            GameObjectType.ITEM, // items
+            GameObjectType.CHAR.GetDescription(), // characters
+            GameObjectType.ITEM.GetDescription(), // items
         };
 
         if (dynamicTypes.Contains(this.data.item.type))
@@ -309,7 +316,7 @@ and have the engine update the textures of those every frame.
             return false;
         }
 
-        if ((this.data.item.visi).VALUE.Insert((this.data.item.visi).VALUE.Length - 1,"") != "")
+        if ((this.data.item.visi).getValue().Insert((this.data.item.visi).getValue().Length - 1,"") != "")
         {
             return false;
         }

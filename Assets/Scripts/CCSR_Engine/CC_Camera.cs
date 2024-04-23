@@ -13,26 +13,25 @@ public class CC_Camera
 {
     //connect to Camera.Main
     private CC_Game game;
-    private float mapWidthPixels = 0;
-    private float mapHeightPixels = 0;
+    private int mapWidthPixels = 0;
+    private int mapHeightPixels = 0;
     private Camera mainCam;
-    private float screenWidth = 0;
-    private float screenHeight = 0;
+    private int screenWidth = 0;
+    private int screenHeight = 0;
 
-    public float scaleX = 0;
-    public float scaleY = 0;
+    public int scaleX = 0;
+    public int scaleY = 0;
 
     private CC_Types.Pos currentCameraPos = new CC_Types.Pos(0, 0);
     private CC_Types.Pos nextCameraPos = new CC_Types.Pos(0, 0);
 
     private bool isPanning = false;
-    private float panStartMS = 0;
-    private float panEndMS = 0;
+    private int panStartMS = 0;
+    private int panEndMS = 0;
 
     private CC_Types.Rect cameraBounds;
 
     private CameraMode cameraMode = CameraMode.PAN_BETWEEN_MAPS;
-
     public CC_Camera(CC_Game game)
     {
         Camera mainCam = Camera.main;
@@ -58,8 +57,8 @@ public class CC_Camera
         {
             mainCam = Camera.main;
         }
-        float w = (int)(Screen.width);
-        float h = (int)(Screen.height);
+        int w = (int)(Screen.width);
+        int h = (int)(Screen.height);
         screenWidth = w;
         screenHeight = h;
 
@@ -92,22 +91,21 @@ public class CC_Camera
        
         CC_Types.Pos lastPos = this.currentCameraPos;
         this.nextCameraPos = this.getMapCameraXY(nextMap);
-       
 
-        float deltaX = this.nextCameraPos.x - lastPos.x;
 
-        float panSpeedX = (416 / 16) * 12 + 100;
-        float panSpeedY = (320 / 16) * 12 + 100;
-        float panTimeMS = deltaX == 0 ? panSpeedX : panSpeedY;
+        int deltaX = this.nextCameraPos.x - lastPos.x;
 
-        float now = DateTime.Now.Millisecond;
+        int panSpeedX = (416 / 16) * 12 + 100;
+        int panSpeedY = (320 / 16) * 12 + 100;
+        int panTimeMS = deltaX == 0 ? panSpeedX : panSpeedY;
+
+        int now = DateTime.Now.Millisecond;
         this.panStartMS = now;
         this.panEndMS = now + panTimeMS;
     }
     public void centerCameraOnPlayer()
     {
-        Debug.Break();
-
+       
         CC_Types.Pos pos = this.game.player.getPosition();
 
         int pX = (int)(-pos.x * this.scaleX);
@@ -171,8 +169,10 @@ public class CC_Camera
 
             CC_Types.Pos p = this.nextCameraPos;
             this.setCamera((int)(p.x - dx), (int)(p.y - dy));
-            return;
+ 
         }
+        
+
     }
     public void snapCameraToMap(string mapName)
     {
@@ -183,9 +183,8 @@ public class CC_Camera
         }
 
         CC_Types.Pos pos = this.getMapCameraXY(mapName);
-        
-        this.currentCameraPos = pos;
-        this.setCamera((int)pos.x, (int)pos.y);
+        Debug.Log("SNAP TO "+ mapName+ " " +pos.x + " "+pos.y);
+        this.setCamera(pos.x, pos.y);
     }
     public void setCameraBounds(string mapTopLeft, string mapBottomRight)
     {
@@ -204,20 +203,22 @@ public class CC_Camera
     {
         CC_Types.Rect data = CC_Game.getMapRect(mapName);
 
-        float x = (-data.x * mainCam.rect.size.x);
-        float y = (-data.y * mainCam.rect.size.y);
+        int x = (-data.x * (int)mainCam.rect.width);
+        int y = (-data.y * (int)mainCam.rect.height);
+        Debug.Log(x);
+        Debug.Log(y);
+        int w = (Screen.width);
+        int h = (Screen.height);
 
-        float w = (Screen.width);
-        float h = (Screen.height);
+        int mapWidth = this.mapWidthPixels * this.scaleX;
+        int mapHeight = this.mapHeightPixels * this.scaleY;
 
-        float mapWidth = this.mapWidthPixels * this.scaleX;
-        float mapHeight = this.mapHeightPixels * this.scaleY;
+        int padX = Screen.width - mapWidth;
+        int padY = Screen.height - mapHeight;
 
-        float padX = this.screenWidth - mapWidth;
-        float padY = this.screenHeight - mapHeight;
-
-            // only make special adjustments to the camera if the world is bigger than our
-            // user's screen
+        // only make special adjustments to the camera if the world is bigger than our
+        // user's screen
+        
             if (this.cameraBounds.width > w) {
                 if (w > h)
                 {
@@ -227,8 +228,8 @@ public class CC_Camera
                     if (test >= 0)
                     {
                         x += half;
-                        float worldWidth = this.cameraBounds.width * this.scaleX;
-                        float finalX = Mathf.Abs(x) + this.screenWidth;
+                        int worldWidth = this.cameraBounds.width * this.scaleX;
+                        int finalX = Mathf.Abs(x) + this.screenWidth;
                         if (finalX > worldWidth)
                         {
                             x += finalX - worldWidth;
@@ -237,13 +238,13 @@ public class CC_Camera
                 }
                 else
                 {
-                    float half = (int)(Mathf.Round(padY / 2));
-                    float test = Mathf.Abs(y) - half;
+                    int half = (int)(Mathf.Round(padY / 2));
+                    int test = Mathf.Abs(y) - half;
                     if (test >= 0)
                     {
                         y += half;
-                        float worldHeight = this.cameraBounds.height * this.scaleY;
-                        float finalY = Mathf.Abs(y) + this.screenHeight;
+                        int worldHeight = this.cameraBounds.height * this.scaleY;
+                        int finalY = Mathf.Abs(y) + this.screenHeight;
                         if (finalY > worldHeight)
                         {
                             y += finalY - worldHeight;
@@ -254,16 +255,17 @@ public class CC_Camera
                 // center map on screen
                 x += this.screenWidth / this.scaleX / 2;
             }
-
-            float newX = (int)Mathf.Round(x);
-            float newY = (int)Mathf.Round(y);
+      
+        int newX = (int)Mathf.Round(x);
+            int newY = (int)Mathf.Round(y);
 
             return new CC_Types.Pos(newX,newY);
   }
-
-    private void setCamera(int x, int y)
+    private void setCamera(float x, float y)
     {
-        Debug.Log("X: "+ x+ " Y: "+ y);
-        this.mainCam.transform.position = new Vector3(x, y, -10);
+       
+        this.currentCameraPos = new CC_Types.Pos((int)x, (int)y);
+
+       this.mainCam.transform.position = new Vector3(this.game.player.gameSprite.transform.position.x, this.game.player.gameSprite.transform.position.y, -10);
     }
 }

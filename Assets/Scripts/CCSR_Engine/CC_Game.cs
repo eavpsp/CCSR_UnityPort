@@ -11,15 +11,15 @@ using static CC_Types;
 public class CC_Game 
 {
   
-    public static float MAP_WIDTH = 416;
-    public static float MAP_HEIGHT = 320;
+    public static int MAP_WIDTH = 416;
+    public static int MAP_HEIGHT = 320;
     public static float UI_WIDTH_PERCENT = 0.6f;
     public static float UI_HEIGHT_PERCENT = 0.6f;
     public CC_Player player;
     public List<CC_GameObject> gameObjects = new List<CC_GameObject>();
     public List<CC_GameObject> movingObjects = new List<CC_GameObject>();
-    public float numMapsX = 0;
-    public float numMapsY = 0;
+    public int numMapsX = 0;
+    public int numMapsY = 0;
     public CC_Types.Rect worldRect;
     public CC_Sound.GameSound sound;
     public CC_Inventory.GameInventory inventory;
@@ -38,7 +38,7 @@ public class CC_Game
     private float lastUpdate = DateTime.Now.Millisecond;
     public bool smoothAnimations = true;
     public GameData gameData;
-    public List<GameMapArea> data = new List<GameMapArea> ();
+    public GameMapAreaDataContainer area = new GameMapAreaDataContainer();
     public float ratio = 416 / 320;
     public CC_Intro introScreen;
     public string episode;
@@ -130,13 +130,13 @@ public class CC_Game
             // If we have reached our destination
             if (obj.posX == obj.movePos.x && obj.posY == obj.movePos.y)
             {
-                float i = obj.moveDirection + 1;
+                int i = obj.moveDirection + 1;
                 obj.moveDirection = i >= CC_GameObject.MOVE_DIRECTIONS.Length ? 0 : i;
                 CC_Types.Rect bounds = obj.getMoveBounds();
-                float dx =
-                  randBetween(0, Mathf.Floor(bounds.width / obj.speed)) * obj.speed;
-                float dy =
-                  randBetween(0, Mathf.Floor(bounds.width / obj.speed)) * obj.speed;
+                int dx =
+                  randBetween(0, (int)Mathf.Floor(bounds.width / obj.speed)) * obj.speed;
+                int dy =
+                  randBetween(0, (int)Mathf.Floor(bounds.width / obj.speed)) * obj.speed;
                 Pos movePos = new Pos
                 (
                       obj.posX + CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection,0] * dx,
@@ -146,8 +146,8 @@ public class CC_Game
         } else
         {
                 // We are not where we want to be, try to step forward.
-                float dx = CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection, 0];
-                float dy = CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection, 1];
+                int dx = CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection, 0];
+                int dy = CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection, 1];
                 CC_Types.Rect bounds = obj.getMoveBounds();
                 Pos nextPos = this.posAfterDeltaMove(obj, dx, dy);
                 CC_Types.Rect nextRect = new CC_Types.Rect { x = nextPos.x, y = nextPos.y, width = obj.width, height = obj.height};
@@ -170,26 +170,18 @@ public class CC_Game
         }
     }
 }
-    public static float[,] getMapOffset(string mapName)
-    {
-        float xIndex = float.Parse(mapName.Substring(0, 2));
-        float yIndex = float.Parse(mapName.Substring(2, 4));
-
-        // Subtract 1 to convert to zero based indexing.
-        return   new float[(int)((xIndex) - 1), (int)((yIndex) - 1)];
-         
+    public static int[] getMapOffset(string mapName)
+    { 
+        string xIndex = (mapName.Substring(0, 2));
+        string yIndex = (mapName.Substring(2, 2));
+        return new int[] { int.Parse(xIndex) - 1, int.Parse(yIndex) - 1 } ;
     }
     public static CC_Types.Pos getMapOffset(string mapName, float i = 0)
     {
-        if (mapName.Length >= 5)
-        {
-            float xIndex = int.Parse(mapName.Substring(0, 2));
-            float yIndex = int.Parse(mapName.Substring(2, 4));
-            return new CC_Types.Pos((xIndex) - 1, (yIndex) - 1);
-
-        }
-
-        return new Pos();
+       
+            string xIndex = mapName.Substring(0, 2);
+            string yIndex = mapName.Substring(2, 2);
+            return new CC_Types.Pos(int.Parse(xIndex) - 1, int.Parse(yIndex) - 1);
         // Subtract 1 to convert to zero based indexing.
 
     }
@@ -197,7 +189,7 @@ public class CC_Game
     {
        this.currentMap = mapName;
 
-        data.Add(EngineManager.instance.GetGameMapAreaJson(mapName));
+        
     }
     public string getMap()
     {
@@ -261,21 +253,27 @@ public class CC_Game
     //
     private void initObjects()
     {
-
-        
+       
+        EngineManager.instance.assets.ForEach((x) =>
+        {
+            if (x.name == "map")
+            {
+               area = EngineManager.instance.GetGameMapAreaJson(x);
+            }
+        });
         List<GameMessages> messages = new List<GameMessages>();
         EngineManager.instance.assets.ForEach((x) =>
         {
             if (x.name == "messagaes")
             {
-                messages.Add(EngineManager.instance.GetGameMessages(x));
+                messages = EngineManager.instance.GetGameMessages(x);
             }
         });
         // Convert all objects in map data to GameObjects
-        foreach(GameMapArea area in data) {
+        foreach(GameMapArea area in this.area.data) {
             // Do not load unused maps.
             // They have a suffix and are longer than 4 characters
-            if (area.roomID.Length > 4)
+            if (area.name.Length > 4)
             {
                 continue;
             }
@@ -289,7 +287,7 @@ public class CC_Game
                 }
 
                 // Replace the message text with the translation for the chosen language
-                if (messages != null)
+               /* if (messages != null)
                 {
                     foreach(GameObjectMessage msg in obj.data.message) {
                         byte[] msgBytes = Encoding.UTF8.GetBytes(msg.text);
@@ -299,17 +297,16 @@ public class CC_Game
                         {
                             hashBytes = sha256.ComputeHash(msgBytes);
                         };
-                         msgHash = BitConverter.ToString(hashBytes).Replace("-", "").Substring(0, msg.text.Length);
+                         msgHash = BitConverter.ToString(hashBytes).Replace("-", "").Substring(0, messages.message.Length);
+                         msgHash = BitConverter.ToString(hashBytes).Replace("-", "").Substring(0, messages.message.Length);
 
-                        foreach (GameMessages mesg in messages)
-                        {
-                            msg.text = mesg[msgHash].ToString();
-                        }
+                          msg.text = messages.message;
+                        
                       
                     }
-                }
+                }*/
 
-                CC_GameObject gameObject = new CC_GameObject(obj, area.roomID);
+                CC_GameObject gameObject = new CC_GameObject(obj, area.name);
                 this.gameObjects.Add(gameObject);
             }
         }
@@ -356,10 +353,12 @@ public class CC_Game
         {
             // Load the PNG file from the specified file path
             string name = memeberName.ToLower();
-            name = name.Replace(".x",".");
-
-            //get translation sata
-            byte[] fileData = System.IO.File.ReadAllBytes(Application.dataPath +"/game/" + EngineManager.instance.episode +"/" + subFolder +"/"+ name);
+            name = name.Replace(".png", "");
+            name = name.Replace(".x", "");
+            name = name + ".png";
+            subFolder = "img";
+        //get translation sata
+        byte[] fileData = System.IO.File.ReadAllBytes(Application.dataPath +"/game/" + EngineManager.instance.episode +"/" + subFolder +"/"+ name);
 
             // Create a new Texture2D
             Texture2D texture = new Texture2D(2, 2);
@@ -380,12 +379,11 @@ public class CC_Game
     public static CC_Types.Rect getMapsRect(string topLeft, string bottomRight){
         CC_Types.Rect TL = getMapRect(topLeft);
         CC_Types.Rect BR = getMapRect(bottomRight);
-        if (bottomRight.Length >=5 && topLeft.Length >= 5)
-        {
-            float xs =
-         int.Parse(bottomRight.Substring(0, 2)) - int.Parse(topLeft.Substring(0, 2)) + 1;
-            float ys =
-              int.Parse(bottomRight.Substring(2, 4)) - int.Parse(topLeft.Substring(2, 4)) + 1;
+     
+            int xs =
+                int.Parse(bottomRight.Substring(0, 2)) - int.Parse(topLeft.Substring(0, 2)) + 1;
+            int ys =
+              int.Parse(bottomRight.Substring(2, 2)) - int.Parse(topLeft.Substring(2, 2)) + 1;
 
             float width = xs * TL.width;
             float height = ys * TL.height;
@@ -399,10 +397,7 @@ public class CC_Game
             };
             return result;
 
-        }
-
-
-        return null;
+        
 }
 public void setFilmLoopObjects()
     {
@@ -422,7 +417,7 @@ public void setFilmLoopObjects()
             }
         }
     }
-    public static int randBetween(float min, float max)
+    public static int randBetween(int min, int max)
     {
         return (int)Mathf.Floor(UnityEngine.Random.Range(0, 1) * (max - min + 1) + min);
     }
@@ -514,11 +509,11 @@ public void setFilmLoopObjects()
 
         });
     }
-    private Pos posAfterDeltaMove(CC_GameObject obj, float dx, float dy) 
+    private Pos posAfterDeltaMove(CC_GameObject obj, int dx, int dy) 
     {
         CC_Types.Rect pos = obj.getRect();
-        float newX = pos.x + dx * obj.speed;
-        float newY = pos.y + dy * obj.speed;
+        int newX = pos.x + dx * obj.speed;
+        int newY = pos.y + dy * obj.speed;
         return new Pos(newX, newY);
  
   }

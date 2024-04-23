@@ -124,7 +124,7 @@ public class CC_Sign
     }
     public void resize()
     {
-        Camera mainCam = Camera.main;
+        
         float width = (Screen.width);
         float height = (Screen.height);
         float x = Mathf.Round(width / 2);

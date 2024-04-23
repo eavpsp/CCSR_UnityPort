@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -12,7 +13,9 @@ public static class CC_Inventory
         NORMAL,
         SELECT,
     }
-    public  interface GameInventoryItemData
+ 
+
+    public interface GameInventoryItemData
     {
         string key { get; set; }
         string name { get; set; } // at first glance, it seems like this isn't used in the game.
@@ -41,12 +44,12 @@ public static class CC_Inventory
 
         private InventoryMode mode = InventoryMode.NORMAL;
 
-        public List<string> items;
-        public List<string> acts;
-        public List<string> names;
+        public List<string> items= new List<string>();
+        public List<string> acts = new List<string>();
+        public List<string> names = new List<string>();
 
         public List<GameInventoryItemData> itemData = new List<GameInventoryItemData>();
-        private List<CC_SpriteUI> itemSprites;
+        private List<CC_SpriteUI> itemSprites = new List<CC_SpriteUI>();
         public GameObject baseObject;
        
 

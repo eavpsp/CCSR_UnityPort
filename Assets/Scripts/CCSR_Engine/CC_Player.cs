@@ -66,12 +66,12 @@ public static class PlayerDirectionExtensions
 
 public class CC_Player : MovableGameObject
 {
-    private float speed;
+    private int speed;
     private bool inWalkingAnimation = false;
     private float walkAnimStartMS = 0;
     private Pos lastPos = new Pos(0, 0);
     private Pos nextPos = new Pos(0, 0);
-    float MovableGameObject.speed {
+    int MovableGameObject.speed {
         get => speed; set => speed = value;
     }
     bool MovableGameObject.inWalkingAnimation {
@@ -146,11 +146,11 @@ public class CC_Player : MovableGameObject
         }
 
     }
-    public void setPosition(float x, float y)
+    public void setPosition(int x, int y)
     {
         this.posX = x;
         this.posY = y;
-        this.gameSprite.transform.position = new Vector2(this.posX, this.posY);
+        this.gameSprite.SetSpritePos(new Vector2(this.posX, this.posY));
 
     }
 
@@ -198,7 +198,7 @@ public class CC_Player : MovableGameObject
     }
 
     public Pos getPosition() {
-        return new Pos(this.gameSprite.transform.position.x, this.gameSprite.transform.position.y);
+        return new Pos((int)this.gameSprite.transform.position.x, (int)this.gameSprite.transform.position.y);
 
     }
     public void setMapAndPosition(string map, int xIndex, int yIndex)
@@ -206,8 +206,8 @@ public class CC_Player : MovableGameObject
         this.lastMap = this.currentMap;
         this.currentMap = map;
         CC_Types.Rect offset = CC_Game.getMapRect(map);
-        float x = xIndex * 16 + offset.x;
-        float y = yIndex * 16 + offset.y;
+        int x = xIndex * 16 + offset.x;
+        int y = yIndex * 16 + offset.y;
         this.setPosition(x, y);
         this.inWalkingAnimation = false;
         this.lastPos = new Pos(x, y);

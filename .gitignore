@@ -373,3 +373,7 @@ FodyWeavers.xsd
 /Assets/Scenes
 /Assets/images/1
 /Assets/game
+/Assets/GT_Engine
+/SwitchIL2CPPCache
+/SwitchIL2CPPStats
+*.nmeta

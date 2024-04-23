@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -39,12 +40,15 @@ public class CC_Scene
         {
             this.game = game;
             this.container.SetActive(false);
+            EngineManager.instance.tickEvent.AddListener(delegate {
+                this.tick(DateTime.Now.Millisecond);
+                });
             this.resize();
         }
 
         public void resize()
         {
-            Camera mainCam = Camera.main;
+            
             float w = (Screen.width);
             float h = (Screen.height);
             this.container.transform.localScale = new Vector2(this.game.camera.scaleX, this.game.camera.scaleY);

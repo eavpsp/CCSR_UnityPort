@@ -16,7 +16,7 @@ public class CC_SpriteGame : MonoBehaviour
             spriteRenderer = this.gameObject.AddComponent<SpriteRenderer>();
 
         }
-        
+        this.gameObject.transform.localScale = new Vector2(3f,3f);
     }
     public void SetSprite(Sprite image)
     {
@@ -26,7 +26,7 @@ public class CC_SpriteGame : MonoBehaviour
     }
     public void SetSpritePos(Vector2 pos)
     {
-        transform.position = pos;
+        transform.position = new Vector2(Mathf.Round(pos.x * 0.03f) ,-Mathf.Round(pos.y * 0.03f));
     }
     public void Visible(bool isVisible)
     {
