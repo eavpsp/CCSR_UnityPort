@@ -15,20 +15,8 @@ public class CC_Sound
     private static AudioClip LoadWavFile(string filePath, int offsetSamples)
     {
       
-        // Read the bytes from the WAV file
-        //byte[] wavData = File.ReadAllBytes(filePath);
-
-      
-
-        // Check if AudioClip creation was successful
-        
-            // Use the AudioClip as needed (e.g., play it)
-            //AudioSource audioSource = gameObject.AddComponent<AudioSource>();
-            //audioSource.clip = audioClip;
-            //audioSource.Play();
           
             AudioClip audioClip = Resources.Load<AudioClip>(filePath);
-            Debug.Log(audioClip == null);
             return audioClip;
         
        

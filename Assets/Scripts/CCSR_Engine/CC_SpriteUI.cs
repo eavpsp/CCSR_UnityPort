@@ -33,6 +33,7 @@ public class CC_SpriteUI : MonoBehaviour
         spriteData = image;
 
         spriteRenderer.sprite = spriteData;
+        
     }
     public void SetSpritePos(Vector2 pos)
     {

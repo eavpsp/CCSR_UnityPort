@@ -349,6 +349,41 @@ public class CC_Game
         }
         
     }
+    public static Texture2D ConvertWhiteToTransparent(Texture2D oldTexture)
+    {
+        
+
+        
+        Texture2D newTexture = new Texture2D(oldTexture.width, oldTexture.height, TextureFormat.RGBA32, false);
+
+       
+        for (int y = 0; y < oldTexture.height; y++)
+        {
+            for (int x = 0; x < oldTexture.width; x++)
+            {
+              
+                Color pixelColor = oldTexture.GetPixel(x, y);
+
+                
+                if (pixelColor.r == 1f && pixelColor.g == 1f && pixelColor.b == 1f)
+                {
+                    
+                    newTexture.SetPixel(x, y, Color.clear);
+                }
+                else
+                {
+                    
+                    newTexture.SetPixel(x, y, pixelColor);
+                }
+            }
+        }
+
+        // Apply the changes to the new texture
+        newTexture.Apply();
+
+        // Update the sprite texture in the SpriteRenderer
+        return newTexture;
+    }
     public static Texture2D getMemberTexture(string memeberName, string subFolder = "character.visuals")
         {
             // Load the PNG file from the specified file path
@@ -359,7 +394,7 @@ public class CC_Game
             //get translation sata
             // Create a new Texture2D
             Texture2D texture = Resources.Load<Texture2D>("game/" + EngineManager.instance.episode + "/" + subFolder + "/" + name);
-
+            texture = ConvertWhiteToTransparent(texture);
 
             return texture;
         }
