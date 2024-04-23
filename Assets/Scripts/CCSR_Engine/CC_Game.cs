@@ -355,14 +355,11 @@ public class CC_Game
             string name = memeberName.ToLower();
             name = name.Replace(".png", "");
             name = name.Replace(".x", "");
-            name = name + ".png";
             subFolder = "img";
-        //get translation sata
-        byte[] fileData = System.IO.File.ReadAllBytes(Application.dataPath +"/game/" + EngineManager.instance.episode +"/" + subFolder +"/"+ name);
-
+            //get translation sata
             // Create a new Texture2D
-            Texture2D texture = new Texture2D(2, 2);
-            texture.LoadImage(fileData); // Load the image data into the texture
+            Texture2D texture = Resources.Load<Texture2D>("game/" + EngineManager.instance.episode + "/" + subFolder + "/" + name);
+
 
             return texture;
         }

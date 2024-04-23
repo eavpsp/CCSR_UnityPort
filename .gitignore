@@ -377,3 +377,4 @@ FodyWeavers.xsd
 /SwitchIL2CPPCache
 /SwitchIL2CPPStats
 *.nmeta
+/Assets/Resources/game

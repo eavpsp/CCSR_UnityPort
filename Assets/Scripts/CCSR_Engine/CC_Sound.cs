@@ -14,15 +14,9 @@ public class CC_Sound
     
     private static AudioClip LoadWavFile(string filePath, int offsetSamples)
     {
-        // Check if the file exists
-        if (!File.Exists(filePath))
-        {
-            Debug.LogError("File does not exist: " + filePath);
-            return null;
-        }
-
+      
         // Read the bytes from the WAV file
-        byte[] wavData = File.ReadAllBytes(filePath);
+        //byte[] wavData = File.ReadAllBytes(filePath);
 
       
 
@@ -32,15 +26,9 @@ public class CC_Sound
             //AudioSource audioSource = gameObject.AddComponent<AudioSource>();
             //audioSource.clip = audioClip;
             //audioSource.Play();
-            int headerSize = 44;
-            int sampleCount = wavData.Length - headerSize;
-            float[] floatData = new float[sampleCount / 2];
-            for (int i = 0; i < sampleCount / 2; i++)
-            {
-                floatData[i] = (float)System.BitConverter.ToInt16(wavData, i * 2 + headerSize + offsetSamples * 2) / 32768.0f;
-            }
-            AudioClip audioClip = AudioClip.Create(filePath, sampleCount / 2, 1, 44100, false);
-            audioClip.SetData(floatData, 0);
+          
+            AudioClip audioClip = Resources.Load<AudioClip>(filePath);
+            Debug.Log(audioClip == null);
             return audioClip;
         
        
@@ -108,40 +96,40 @@ public class CC_Sound
         {
             //load in game audio as audio clips to be stored
             this.engine = engine;
-            string root = Application.dataPath+"/game/" + episode +"/sound/";
+            string root = "game/" + episode +"/sound/";
             this.root = root;
-            this.walk.soundClip = CC_Sound.LoadWavFile(root + "walk.wav", 0);
+            this.walk.soundClip = CC_Sound.LoadWavFile(root + "walk", 0);
             this.walk.loop = true;
             soundBank.Add("walk", walk);
-            this.push.soundClip = CC_Sound.LoadWavFile(root + "push.wav", 0);
+            this.push.soundClip = CC_Sound.LoadWavFile(root + "push", 0);
             this.push.loop = true;
             soundBank.Add("push", push);
-            this.boat.soundClip = CC_Sound.LoadWavFile(root + "boat.wav", 0);
+            this.boat.soundClip = CC_Sound.LoadWavFile(root + "boat", 0);
             this.boat.loop = true;
             soundBank.Add("boat", boat);
-            this.bump.soundClip = CC_Sound.LoadWavFile(root + "bump.wav", 0);
+            this.bump.soundClip = CC_Sound.LoadWavFile(root + "bump", 0);
             soundBank.Add("bump", bump);
-            this.chimes.soundClip = CC_Sound.LoadWavFile(root + "chimes.wav", 0);
+            this.chimes.soundClip = CC_Sound.LoadWavFile(root + "chimes", 0);
             soundBank.Add("chimes", chimes);
-            this.message.soundClip = CC_Sound.LoadWavFile(root + "message.wav", 0);
+            this.message.soundClip = CC_Sound.LoadWavFile(root + "message", 0);
             soundBank.Add("message", message);
-            this.secret.soundClip = CC_Sound.LoadWavFile(root + "discover.wav", 0);
+            this.secret.soundClip = CC_Sound.LoadWavFile(root + "discover", 0);
             soundBank.Add("secret", secret);
-            this.correct.soundClip = CC_Sound.LoadWavFile(root + "correct.wav", 0);
+            this.correct.soundClip = CC_Sound.LoadWavFile(root + "correct", 0);
             soundBank.Add("correct", correct);
-            this.incorrect.soundClip = CC_Sound.LoadWavFile(root + "incorrect.wav", 0);
+            this.incorrect.soundClip = CC_Sound.LoadWavFile(root + "incorrect", 0);
             soundBank.Add("incorrect", incorrect);
-            this.click.soundClip = CC_Sound.LoadWavFile(root + "click.wav", 0);
+            this.click.soundClip = CC_Sound.LoadWavFile(root + "click", 0);
             soundBank.Add("click", click);
-            this.win.soundClip = CC_Sound.LoadWavFile(root + "win.wav", 0);
+            this.win.soundClip = CC_Sound.LoadWavFile(root + "win", 0);
             soundBank.Add("win", win);
-            this.lose.soundClip = CC_Sound.LoadWavFile(root + "lose.wav", 0);
+            this.lose.soundClip = CC_Sound.LoadWavFile(root + "lose", 0);
             soundBank.Add("lose", lose);
-            this.theme.soundClip = CC_Sound.LoadWavFile(root + "theme.main.wav", 0);
+            this.theme.soundClip = CC_Sound.LoadWavFile(root + "theme.main", 0);
             soundBank.Add("theme", theme);
-            this.theme1.soundClip = CC_Sound.LoadWavFile(root + "theme.change.1.wav", 0);
+            this.theme1.soundClip = CC_Sound.LoadWavFile(root + "theme.change.1", 0);
             soundBank.Add("theme1", theme1);
-            this.theme2.soundClip = CC_Sound.LoadWavFile(root + "theme.change.2.wav", 0);
+            this.theme2.soundClip = CC_Sound.LoadWavFile(root + "theme.change.2", 0);
             soundBank.Add("theme2", theme2);
 
 
@@ -149,10 +137,10 @@ public class CC_Sound
             // Episode 1
             if (episode == "1")
             {
-                this.pop.soundClip = CC_Sound.LoadWavFile(root + "pop.wav", 0);
-                this.water.soundClip = CC_Sound.LoadWavFile(root + "water.wav", 0);
+                this.pop.soundClip = CC_Sound.LoadWavFile(root + "pop", 0);
+                this.water.soundClip = CC_Sound.LoadWavFile(root + "water", 0);
                 this.water.loop = true;
-                this.squeak.soundClip = CC_Sound.LoadWavFile(root + "squeak.wav", 0);
+                this.squeak.soundClip = CC_Sound.LoadWavFile(root + "squeak", 0);
                 this.squeak.loop = true;
                 soundBank.Add("pop", pop);
                 soundBank.Add("water", water);
@@ -163,11 +151,11 @@ public class CC_Sound
             // Episode 2
             if (episode == "2")
             {
-                this.robot.soundClip = CC_Sound.LoadWavFile(root + "robot.wav", 0);
+                this.robot.soundClip = CC_Sound.LoadWavFile(root + "robot", 0);
                 this.robot.loop = true;
-                this.headBounce.soundClip = CC_Sound.LoadWavFile(root + "headBounce.wav", 0);
-                this.headPop.soundClip = CC_Sound.LoadWavFile(root + "headPop.wav", 0);
-                this.alarm.soundClip = CC_Sound.LoadWavFile(root + "alarm.wav", 0);
+                this.headBounce.soundClip = CC_Sound.LoadWavFile(root + "headBounce", 0);
+                this.headPop.soundClip = CC_Sound.LoadWavFile(root + "headPop", 0);
+                this.alarm.soundClip = CC_Sound.LoadWavFile(root + "alarm", 0);
                 this.alarm.loop = true;
                 soundBank.Add("robot", robot);
                 soundBank.Add("headBounce", headBounce);
@@ -178,9 +166,9 @@ public class CC_Sound
             // Episode 3
             if (episode == "3")
             {
-                this.rumble.soundClip = CC_Sound.LoadWavFile(root + "rumble.wav", 0);
+                this.rumble.soundClip = CC_Sound.LoadWavFile(root + "rumble", 0);
                 this.rumble.loop = true;
-                this.volcano.soundClip = CC_Sound.LoadWavFile(root + "volcano.wav", 0);
+                this.volcano.soundClip = CC_Sound.LoadWavFile(root + "volcano", 0);
                 soundBank.Add("rumble", rumble);
                 soundBank.Add("volcano", volcano);
             }
@@ -189,9 +177,9 @@ public class CC_Sound
             if (episode == "4")
             {
 
-                this.crowd.soundClip = CC_Sound.LoadWavFile(root + "crowd.wav", 0);
+                this.crowd.soundClip = CC_Sound.LoadWavFile(root + "crowd", 0);
                 this.crowd.loop = true;
-                this.disco.soundClip = CC_Sound.LoadWavFile(root + "disco.wav", 0);
+                this.disco.soundClip = CC_Sound.LoadWavFile(root + "disco", 0);
                 this.disco.loop = true;
                 soundBank.Add("crowd", crowd);
                 soundBank.Add("disco", disco);
@@ -217,7 +205,7 @@ public class CC_Sound
              {
                
                     CC_AudioFile audioFile = new CC_AudioFile();
-                    audioFile.soundClip = CC_Sound.LoadWavFile(root + sound + ".wav", 0);
+                    audioFile.soundClip = CC_Sound.LoadWavFile(root + sound, 0);
                     audioFile.loop = loops.Contains(sound);
                     soundBank.Add(sound, audioFile);
             }

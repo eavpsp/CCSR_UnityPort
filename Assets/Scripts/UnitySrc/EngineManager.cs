@@ -57,7 +57,9 @@ public class EngineManager : MonoBehaviour
     public GameMapAreaDataContainer GetGameMapAreaJson(AssetData asset)
     {
         GameMapAreaDataContainer areas = new GameMapAreaDataContainer();
-        string jsonString = File.ReadAllText(asset.path);
+        TextAsset JSON = new TextAsset();
+        JSON = Resources.Load<TextAsset>(asset.path);
+        string jsonString = JSON.text;
         JsonUtility.FromJsonOverwrite(jsonString, areas);
         return areas;
     }
@@ -74,7 +76,9 @@ public class EngineManager : MonoBehaviour
         List<GameMessages> data = new List<GameMessages>();
         if (asset != null)
         {
-            string jsonString = File.ReadAllText(asset.path);
+            TextAsset JSON = new TextAsset();
+            JSON = Resources.Load<TextAsset>(asset.path);
+            string jsonString = JSON.text;
             JsonUtility.FromJsonOverwrite(jsonString, data);
         }
 
@@ -83,8 +87,10 @@ public class EngineManager : MonoBehaviour
     public GameData GetGameData(AssetData asset)
     {
         GameData data = new GameData();
-        string jsonString = File.ReadAllText(asset.path);
-        
+        TextAsset JSON = new TextAsset();
+        JSON = Resources.Load<TextAsset>(asset.path);
+        string jsonString = JSON.text;
+
         JsonUtility.FromJsonOverwrite(jsonString, data);
         
 
@@ -92,33 +98,33 @@ public class EngineManager : MonoBehaviour
     }
     public void LoadJsonAssets(string episodeNumber, string lang, Action doneCallBack)
     {
-        string root = Application.dataPath + "/game/" + episodeNumber + "/";
+        string root = "game/" + episodeNumber + "/";
         assets = new List<AssetData>{
 
             new AssetData
             {
                 name = "textures",
-                path = root + "ep" + episodeNumber + ".json"
+                path = root + "ep" + episodeNumber
             },
             new AssetData
             {
                 name = "ending",
-                path = root + "ep" + episodeNumber + "_ending.json"
+                path = root + "ep" + episodeNumber + "_ending"
             },
              new AssetData
             {
                 name = "map",
-                path = root + "map" + episodeNumber + ".json"
+                path = root + "map" + episodeNumber
             },
               new AssetData
             {
                 name = "game",
-                path = root + lang + "/game.json"
+                path = root + lang + "/game"
             },
                  new AssetData
             {
                 name = "message",
-                path = root + lang + "/message.json"
+                path = root + lang + "/message"
             },
         };
         if (lang != "en")
@@ -126,7 +132,7 @@ public class EngineManager : MonoBehaviour
             assets.Add(new AssetData
             {
                 name = "translated",
-                path = root + lang + "/ep" + episodeNumber + ".json",
+                path = root + lang + "/ep" + episodeNumber,
             });
         }
         doneCallBack();
