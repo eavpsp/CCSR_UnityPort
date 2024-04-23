@@ -93,7 +93,7 @@ public class CC_Camera
         this.nextCameraPos = this.getMapCameraXY(nextMap);
 
 
-        int deltaX = this.nextCameraPos.x - lastPos.x;
+        float deltaX = this.nextCameraPos.x - lastPos.x;
 
         int panSpeedX = (416 / 16) * 12 + 100;
         int panSpeedY = (320 / 16) * 12 + 100;
@@ -203,8 +203,8 @@ public class CC_Camera
     {
         CC_Types.Rect data = CC_Game.getMapRect(mapName);
 
-        int x = (-data.x * (int)mainCam.rect.width);
-        int y = (-data.y * (int)mainCam.rect.height);
+        float x = (-data.x * mainCam.rect.width);
+        float y = (-data.y * mainCam.rect.height);
         Debug.Log(x);
         Debug.Log(y);
         int w = (Screen.width);
@@ -228,8 +228,8 @@ public class CC_Camera
                     if (test >= 0)
                     {
                         x += half;
-                        int worldWidth = this.cameraBounds.width * this.scaleX;
-                        int finalX = Mathf.Abs(x) + this.screenWidth;
+                        float worldWidth = this.cameraBounds.width * this.scaleX;
+                        float finalX = Mathf.Abs(x) + this.screenWidth;
                         if (finalX > worldWidth)
                         {
                             x += finalX - worldWidth;
@@ -239,12 +239,12 @@ public class CC_Camera
                 else
                 {
                     int half = (int)(Mathf.Round(padY / 2));
-                    int test = Mathf.Abs(y) - half;
+                    float test = Mathf.Abs(y) - half;
                     if (test >= 0)
                     {
                         y += half;
-                        int worldHeight = this.cameraBounds.height * this.scaleY;
-                        int finalY = Mathf.Abs(y) + this.screenHeight;
+                        float worldHeight = this.cameraBounds.height * this.scaleY;
+                        float finalY = Mathf.Abs(y) + this.screenHeight;
                         if (finalY > worldHeight)
                         {
                             y += finalY - worldHeight;

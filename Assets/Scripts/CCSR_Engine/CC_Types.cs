@@ -71,21 +71,21 @@ public static class CC_Types
 
     public struct Pos
     {
-        public Pos(int _x, int _y)
+        public Pos(float _x, float _y)
         {
             x = _x;
             y = _y;
         }
-        public int x;
-        public int y;
+        public float x;
+        public float y;
     }
 
     public class Rect
     {
-        public int x;
-        public int y;
-        public int width;
-        public int height;
+        public float x;
+        public float y;
+        public float width;
+        public float height;
     }
     [Serializable]
     public class GameMapArea

@@ -128,14 +128,16 @@ public class CC_Player : MovableGameObject
         Texture2D newTex = CC_Game.getMemberTexture(this.getTextureString());
         this.gameSprite = new GameObject("player").AddComponent<CC_SpriteGame>();
         this.gameSprite.SetSprite(Sprite.Create(newTex, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
-
+        this.gameSprite.spriteRenderer.sortingOrder = 1;
         if (this.game.engineType == CC_Game.EngineType.Scooby)
         {
             Texture2D newScoobTex = CC_Game.getMemberTexture("scooby.down.1");
             this.scoobySprite = new GameObject("scooby").AddComponent<CC_SpriteGame>();
             this.scoobySprite.SetSprite(Sprite.Create(newScoobTex, new UnityEngine.Rect(new Vector2(this.posX, this.posY), new Vector2(newTex.width, newTex.height)), Vector2.one * 0.5f));
+            this.scoobySprite.spriteRenderer.sortingOrder = 1;
 
         }
+
     }
     public void SetStatus(PlayerStatus stat)
     {
@@ -146,7 +148,7 @@ public class CC_Player : MovableGameObject
         }
 
     }
-    public void setPosition(int x, int y)
+    public void setPosition(float x, float y)
     {
         this.posX = x;
         this.posY = y;
@@ -206,8 +208,8 @@ public class CC_Player : MovableGameObject
         this.lastMap = this.currentMap;
         this.currentMap = map;
         CC_Types.Rect offset = CC_Game.getMapRect(map);
-        int x = xIndex * 16 + offset.x;
-        int y = yIndex * 16 + offset.y;
+        float x = xIndex * 16 + offset.x;
+        float y = yIndex * 16 + offset.y;
         this.setPosition(x, y);
         this.inWalkingAnimation = false;
         this.lastPos = new Pos(x, y);

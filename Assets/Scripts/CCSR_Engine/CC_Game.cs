@@ -130,13 +130,13 @@ public class CC_Game
             // If we have reached our destination
             if (obj.posX == obj.movePos.x && obj.posY == obj.movePos.y)
             {
-                int i = obj.moveDirection + 1;
+                float i = obj.moveDirection + 1;
                 obj.moveDirection = i >= CC_GameObject.MOVE_DIRECTIONS.Length ? 0 : i;
                 CC_Types.Rect bounds = obj.getMoveBounds();
-                int dx =
-                  randBetween(0, (int)Mathf.Floor(bounds.width / obj.speed)) * obj.speed;
-                int dy =
-                  randBetween(0, (int)Mathf.Floor(bounds.width / obj.speed)) * obj.speed;
+                float dx =
+                  randBetween(0, Mathf.Floor(bounds.width / obj.speed) * obj.speed);
+                float dy =
+                  randBetween(0, Mathf.Floor(bounds.width / obj.speed) * obj.speed);
                 Pos movePos = new Pos
                 (
                       obj.posX + CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection,0] * dx,
@@ -449,9 +449,9 @@ public void setFilmLoopObjects()
             }
         }
     }
-    public static int randBetween(int min, int max)
+    public static float randBetween(float min, float max)
     {
-        return (int)Mathf.Floor(UnityEngine.Random.Range(0, 1) * (max - min + 1) + min);
+        return Mathf.Floor(UnityEngine.Random.Range(0, 1) * (max - min + 1) + min);
     }
     public void updateAllVisibility()
     {
@@ -541,11 +541,11 @@ public void setFilmLoopObjects()
 
         });
     }
-    private Pos posAfterDeltaMove(CC_GameObject obj, int dx, int dy) 
+    private Pos posAfterDeltaMove(CC_GameObject obj, float dx, float dy) 
     {
         CC_Types.Rect pos = obj.getRect();
-        int newX = pos.x + dx * obj.speed;
-        int newY = pos.y + dy * obj.speed;
+        float newX = pos.x + dx * obj.speed;
+        float newY = pos.y + dy * obj.speed;
         return new Pos(newX, newY);
  
   }
