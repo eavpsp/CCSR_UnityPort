@@ -160,7 +160,7 @@ public class CC_GameObject : IGameObject, MovableGameObject
         this.movePos = this.lastPos;
 
         Texture2D objTexture;
-
+        //Clean up sorting issues
         this.sprite = new GameObject(member).AddComponent<CC_SpriteGame>();
         if (this.member.ToLower().Contains("tile"))
         {
@@ -254,6 +254,12 @@ public class CC_GameObject : IGameObject, MovableGameObject
     }
 
     public void setPosition(int x, int y)
+    {
+        this.posX = x;
+        this.posY = y;
+        sprite.transform.position = new Vector2(x, y);
+    }
+    public void setPosition(float x, float y)
     {
         this.posX = x;
         this.posY = y;

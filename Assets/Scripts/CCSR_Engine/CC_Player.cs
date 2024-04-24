@@ -66,7 +66,7 @@ public static class PlayerDirectionExtensions
 
 public class CC_Player : MovableGameObject
 {
-    private int speed;
+    public int speed;
     private bool inWalkingAnimation = false;
     private float walkAnimStartMS = 0;
     private Pos lastPos = new Pos(0, 0);

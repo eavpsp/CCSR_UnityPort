@@ -70,6 +70,26 @@ public class CC_Sign
         this.textElement.text = message;
 
     }
+    public void showCharacterMessage(string charName, string message)
+    {
+        this.game.sound.once(this.game.sound.message);
+        this.game.inventory.closeInventory();
+        this.game.player.SetStatus(PlayerStatus.READ);
+        this.isCharacterMessage = true;
+        this.isMessageShowing = true;
+        this.setTextDimensions(false);
+        Texture2D spriteTexture = CC_Game.getMemberTexture("talk.bkg");
+        this.sprite.SetSprite(Sprite.Create(spriteTexture, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(spriteTexture.width, spriteTexture.height)), Vector2.one * 0.5f));
+
+        this.sprite.Visible(true);
+
+        Texture2D charSpriteTexture = CC_Game.getMemberTexture(charName + ".face");
+        this.characterSprite.SetSprite(Sprite.Create(charSpriteTexture, new UnityEngine.Rect(new Vector2(0, 0), new Vector2(charSpriteTexture.width, charSpriteTexture.height)), Vector2.one * 0.5f));
+
+        this.characterSprite.Visible(true);
+
+        this.textElement.text = message;
+    }
     private void setTextDimensions(bool isSign)
     {
         float width = isSign ? 242 : 165;

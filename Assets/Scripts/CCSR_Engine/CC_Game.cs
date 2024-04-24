@@ -191,12 +191,10 @@ public class CC_Game
 
         
     }
-    //TODO
-    /*
+    //TODO - Add player movement and update
+    
     public void movePlayer(float dx, float dy)
     {
-        
-            this.debug.updateItemText();
 
             // player isn't moving, stop the walking sound
             if (dx == 0 && dy == 0)
@@ -205,9 +203,9 @@ public class CC_Game
                 return;
             }
 
-            const pos = this.player.getPosition();
-            const newX = pos.x + dx * this.player.speed;
-            const newY = pos.y + dy * this.player.speed;
+            Pos pos = this.player.getPosition();
+            float newX = pos.x + dx * this.player.speed;
+            float newY = pos.y + dy * this.player.speed;
 
             // TODO
 
@@ -220,42 +218,42 @@ public class CC_Game
 
             // This could be a tiny bug if the player's texture is
             //  supposed to change and it's not a 32x32 size
-            const newPlayerRect = this.player.getCollisionRectAtPoint(newX, newY);
+            CC_Types.Rect newPlayerRect = this.player.getCollisionRectAtPoint(newX, newY);
 
-            if (!rectAinRectB(newPlayerRect, this.worldRect!))
+            if (!CC_Collision.rectAinRectB(newPlayerRect, this.worldRect!))
             {
                 return;
             }
 
-            const collisionObject = this.gameObjects.find(
-              (obj) => obj.isVisible() && intersect(newPlayerRect, obj.getRect())
+            CC_GameObject collisionObject = this.gameObjects.Find(
+              (obj) => obj.isVisible() && CC_Collision.Intersect(newPlayerRect, obj.getRect())
             );
 
-            if (collisionObject === undefined)
+            if (collisionObject == null)
             {
-                console.log("No game object was found where you tried to walk!");
+                Debug.Log("No game object was found where you tried to walk!");
                 return;
             }
 
             // Determine if this object has a message to show.
-            const messages = collisionObject.data.message;
+            GameObjectMessage[] messages = collisionObject.data.message;
 
             // TODO: possibly try to clean up this mess in the future
             // It just looks sloppy, but I wrote it this way to match
             // the logic of the original game.
-            let message = "";
+            string message = "";
 
-            if (messages.length > 0)
+            if (messages.Length > 0)
             {
-                console.log(collisionObject);
+                Debug.Log(collisionObject);
                 // Find the message which is relavant to our player's state
-                for (const m of messages) {
-                    if (!m.plrAct && !m.plrObj)
+                foreach(GameObjectMessage m in messages) {
+                    if (m.plrAct == "" && m.plrObj == "")
                     {
                         message = m.text;
                         continue;
                     }
-                    if (!m.plrObj && m.plrAct)
+                    if (m.plrObj == "" && m.plrAct != "")
                     {
                         if (this.inventory.has(m.plrAct))
                         {
@@ -264,7 +262,7 @@ public class CC_Game
                         }
                         continue;
                     }
-                    if (m.plrObj && !m.plrAct)
+                    if (m.plrObj != "" && m.plrAct == "")
                     {
                         if (this.inventory.has(m.plrObj))
                         {
@@ -273,7 +271,7 @@ public class CC_Game
                         }
                         continue;
                     }
-                    if (m.plrObj && m.plrAct)
+                    if (m.plrObj != "" && m.plrAct != "")
                     {
                         if (this.inventory.has(m.plrObj) && this.inventory.has(m.plrAct))
                         {
@@ -284,14 +282,14 @@ public class CC_Game
                 }
             }
 
-            if (message)
+            if (message != "")
             {
                 if (
-                  collisionObject.data.item.type == GameObjectType.CHAR ||
-                  collisionObject.data.item.type == GameObjectType.ITEM
+                  collisionObject.data.item.type == GameObjectType.CHAR.GetDescription() ||
+                  collisionObject.data.item.type == GameObjectType.ITEM.GetDescription()
                 )
                 {
-                    this.sign.showCharacterMessage(collisionObject.member, message);
+                    this.sign. showCharacterMessage(collisionObject.member, message);
                 }
                 else
                 {
@@ -299,24 +297,24 @@ public class CC_Game
                 }
             }
 
-            const conds = collisionObject.data.item.COND.filter(
-              (c): c is GameObjectCond => c !== null
-    );
+            GameObjectCond[] conds = collisionObject.data.item.COND.Where(
+              (c) => c != null
+    ).ToArray();
 
-            let getItem = false;
-            let condIndex = -1;
+            bool getItem = false;
+            int condIndex = -1;
 
-            if (conds.length > 0)
+            if (conds.Length > 0)
             {
-                for (const c of conds) {
+                foreach(GameObjectCond c in conds) {
                     condIndex++;
-                    if (!c.hasObj && !c.hasAct)
+                    if (c.hasObj == "" && c.hasAct == "")
                     {
                         // console.log("!hasObj && !hasAct");
                         getItem = true;
                         continue;
                     }
-                    if (!c.hasObj && c.hasAct)
+                    if (c.hasObj == "" && c.hasAct != "")
                     {
                         // console.log("!hasObj && hasAct");
                         if (this.inventory.has(c.hasAct))
@@ -327,7 +325,7 @@ public class CC_Game
                         // Possible bug? Check this if there are problems in game
                         // continue;
                     }
-                    if (c.hasObj && !c.hasAct)
+                    if (c.hasObj != "" && c.hasAct == "")
                     {
                         // console.log("hasObj && !hasAct");
                         if (this.inventory.has(c.hasObj))
@@ -337,7 +335,7 @@ public class CC_Game
                         }
                         break;
                     }
-                    if (c.hasObj && c.hasAct)
+                    if (c.hasObj != "" && c.hasAct != "")
                     {
                         // console.log("hasObj && hasAct");
                         if (this.inventory.has(c.hasObj) && this.inventory.has(c.hasAct))
@@ -352,9 +350,9 @@ public class CC_Game
 
             if (getItem)
             {
-                const c = conds[condIndex];
+                GameObjectCond c = conds[condIndex];
                 if (
-                  c.giveObj &&
+                  c.giveObj != "" &&
                   !this.inventory.has(c.giveObj) &&
                   !this.inventory.has("got" + c.giveObj)
                 )
@@ -362,40 +360,35 @@ public class CC_Game
                     this.inventory.addItem(c.giveObj);
 
                     // fugly scooby hack
-                    if (this.engineType === EngineType.Scooby)
+                    if (this.engineType == EngineType.Scooby)
                     {
-                        if (c.giveObj === "nobats")
+                        if (c.giveObj == "nobats")
                         {
-                            this.sound.soundBank["bunch_o_bats"].stop();
+                           // this.sound.soundBank["bunch_o_bats"];
                         }
                     }
-
-                    this.sign.setOnClose(() => {
-                        // for some reason I have to wrap this in a timeout
-                        // or else the inventory won't display...
-                        // stupid bugs, but who cares at this point
-                        // I'm not going to be the one who figures out
-                        // why it doesn't work the normal way
-                        setTimeout(() => {
-                            this.inventory.openInventory(c.giveObj);
-                        }, 1);
-                    });
+                UnityEvent onCloseEvent = new UnityEvent();
+                onCloseEvent.AddListener(delegate
+                {
+                    this.inventory.openInventory(c.giveObj);
+                });
+                this.sign.SetOnClose(onCloseEvent);
                 }
-                if (c.giveAct && !this.inventory.has(c.giveAct))
+                if (c.giveAct != "" && !this.inventory.has(c.giveAct))
                 {
                     this.inventory.addAct(c.giveAct);
                 }
             }
 
-            let inWater = false;
+            bool inWater = false;
 
             
-            const name = collisionObject.data.item.name;
-            if (name && !name.includes("="))
+            string name = collisionObject.data.item.name;
+            if (name != "" && !name.Contains("="))
             {
                 if (!this.inventory.has(name))
                 {
-                    this.inventory.names.push(name);
+                    this.inventory.names.Add(name);
                     this.inventory.addAct("got" + name);
                 }
             }
@@ -403,57 +396,57 @@ public class CC_Game
             // Switch over object type and handle each case differently
             switch (collisionObject.data.item.type)
             {
-                case GameObjectType.FLOR:
+                case "FLOR":
                     break;
-                case GameObjectType.CHAR:
-                case GameObjectType.WALL:
+                case "CHAR":
+                case "WALL":
                     {
                         if (collisionObject.data.move.COND == GameObjectMoveCond.PUSH)
                         {
-                            const toPos = this.posAfterDeltaMove(collisionObject, dx, dy);
+                            Pos toPos = this.posAfterDeltaMove(collisionObject, dx, dy);
                             if (this.canMoveGameObject(collisionObject, toPos))
                             {
                                 // Make sure the player doesn't collide with something
                                 // in his new coordinates that isn't the push object
-                                const futureCollision = this.gameObjects.find(
+                                CC_GameObject futureCollision = this.gameObjects.Find(
                                   (obj) =>
                                     obj.isVisible() &&
-                                    intersect(newPlayerRect, obj.getRect()) &&
-                                    obj.data.item.type == GameObjectType.WALL &&
+                                    CC_Collision.Intersect(newPlayerRect, obj.getRect()) &&
+                                    obj.data.item.type == GameObjectType.WALL.GetDescription() &&
                                     obj != collisionObject
                                 );
 
-                                if (futureCollision)
+                                if (futureCollision != null)
                                 {
                                     return;
                                 }
 
-                                const lastPos = {
-              x: collisionObject.posX,
-              y: collisionObject.posY,
-            };
+                                Pos lastPos = new Pos{
+                                      x= collisionObject.posX,
+                                      y=collisionObject.posY,
+                                    };
                             collisionObject.initMove(lastPos, toPos);
-                            this.movingObjects.push(collisionObject);
-                            this.sound.push.play();
+                            this.movingObjects.Add(collisionObject);
+                            this.sound.SetSFXClip(this.sound.push);
+                            EngineManager.instance.SFX.Play();
                             break;
                         }
                     }
-                    if (collisionObject.data.item.type == GameObjectType.WALL && !message)
+                    if (collisionObject.data.item.type == GameObjectType.WALL.GetDescription() && message != "")
                     {
-                        if (this.engineType === EngineType.CCSR)
+                        if (this.engineType == EngineType.CCSR)
                         {
                             this.sound.once(this.sound.bump);
                         }
-                        else if (this.engineType === EngineType.Scooby)
+                        else if (this.engineType == EngineType.Scooby)
                         {
-                            const bumpSounds = ["bump", "ruh_oh", undefined, undefined];
-                            const randIndex = Math.floor(Math.random() * bumpSounds.length);
+                            string[] bumpSounds = new string[] {"bump", "ruh_oh", "", ""};
+                            int randIndex = (int)Mathf.Floor(UnityEngine.Random.Range(0,1) * bumpSounds.Length);
                             // console.log(randIndex)
-                            const randSound = bumpSounds[randIndex];
-                            if (randSound !== undefined)
+                            string randSound = bumpSounds[randIndex];
+                            if (randSound != string.Empty)
                             {
-                                if (!this.sound.soundBank["bump"].playing() &&
-                                  !this.sound.soundBank["ruh_oh"].playing())
+                                if (!EngineManager.instance.SFX.isPlaying)
                                 {
                                     this.sound.dynamicSoundOnce(randSound);
                                 }
@@ -463,11 +456,11 @@ public class CC_Game
                     }
                     return;
             }
-      case GameObjectType.ITEM: {
+      case "ITEM": {
                 this.removeGameObject(collisionObject);
                 break;
             }
-      case GameObjectType.WATER: {
+      case "WATER": {
                 // only allow water travel if you have a boat
                 if (!this.inventory.has("scuba"))
                 {
@@ -477,11 +470,12 @@ public class CC_Game
                 inWater = true;
                 break;
             }
-      case GameObjectType.DOOR: {
-                const data = collisionObject.data.item.name.split("=");
-                const action = data[0].toUpperCase();
+      case "DOOR": {
+                string[] data = collisionObject.data.item.name.Split('=');
+                string action = data[0].ToUpper();
 
-                this.sound.chimes.play();
+                this.sound.SetSFXClip(this.sound.chimes);
+                    EngineManager.instance.SFX.Play();
 
                 switch (action)
                 {
@@ -492,12 +486,13 @@ public class CC_Game
                         }
                     case "ROOM":
                         {
-                            const coords = data[1].split(".").map((x) => parseInt(x));
-                            const mapX = coords[0].toString().padStart(2, "0");
-                            const mapY = coords[1].toString().padStart(2, "0");
-                            const map = mapX + mapY;
-                            const x = coords[2];
-                            const y = coords[3];
+                            string coordsString = data[1];
+                            int[] coords = coordsString.Split('.').Select((x) => int.Parse(x)).ToArray();
+                            string mapX = coords[0].ToString().PadLeft(2, '0');
+                            string mapY = coords[1].ToString().PadLeft(2, '0');
+                            string map = mapX + mapY;
+                            int x = coords[2];
+                            int y = coords[3];
                             this.script.onNewMap(map);
                             this.setMap(map);
                             this.player.setMapAndPosition(map, x, y);
@@ -507,38 +502,38 @@ public class CC_Game
                         }
                 }
 
-                console.log(data);
+                Debug.Log(data);
                 break;
             }
             default:
-        console.log(collisionObject);
+                Debug.Log(collisionObject);
             break;
         }
 
-        const newState = inWater ? PlayerState.BOAT : PlayerState.NORMAL;
+        PlayerState newState = inWater ? PlayerState.BOAT : PlayerState.NORMAL;
         this.player.state = newState;
 
         // Update map and do bookkeeping when leaving a zone
-        const nextMap = this.gameObjects.find(
+        CC_GameObject nextMap = this.gameObjects.Find(
           (obj) =>
-            obj.mapName !== this.player.currentMap &&
+            obj.mapName != this.player.currentMap &&
             obj.isVisible() &&
-            intersect(newPlayerRect, obj.getRect())
+            CC_Collision.Intersect(newPlayerRect, obj.getRect())
         );
 
-        const fullyInMap = rectAinRectB(
+        bool fullyInMap = CC_Collision.rectAinRectB(
           newPlayerRect,
           getMapRect(this.player.currentMap)
         );
 
-        if (nextMap && !fullyInMap)
+        if (nextMap != null && !fullyInMap)
         {
             //console.log("from", this.player.currentMap, "to:", nextMap.mapName);
-            const pos = this.player.getPosition();
-            const bounds = getMapRect(nextMap.mapName);
+            pos = this.player.getPosition();
+            CC_Types.Rect bounds = getMapRect(nextMap.mapName);
 
-            let nextX = pos.x;
-            let nextY = pos.y;
+            float nextX = pos.x;
+            float nextY = pos.y;
 
             if (nextX < bounds.x)
             {
@@ -560,35 +555,34 @@ public class CC_Game
                 nextY = bounds.y + bounds.height - 16;
             }
 
-            let nextPos: Pos;
+            Pos nextPos;
 
             if (this.camera.getMode() == CameraMode.PAN_BETWEEN_MAPS)
             {
-                nextPos = { x: nextX, y: nextY };
+                nextPos = new Pos{ x= nextX, y= nextY };
 
                 // pan scooby as well
-                if (this.engineType === EngineType.Scooby)
+                if (this.engineType == EngineType.Scooby)
                 {
-                    const delta = { ...nextPos };
+                    Pos delta = new Pos(nextPos.x - pos.x, nextPos.y - pos.y);
                     delta.x -= pos.x;
                     delta.y -= pos.y;
 
                     // ugly hack to fix camera panning when moving north
                     // Idk why it's so broken but I don't care at all to understand it
                     // we're just gonna hotfix it
-                    if (delta.y === 0 && delta.x === 0)
+                    if (delta.y == 0 && delta.x == 0)
                     {
                         nextPos.y -= 32;
-                        this.player.scooby.y -= 32
+                        this.player.scoobySprite.transform.position = new Vector2(this.player.scoobySprite.transform.position.x, this.player.scoobySprite.transform.position.y - 32);
                     }
 
-                    this.player.scooby.x += delta.x;
-                    this.player.scooby.y += delta.y;
+                    this.player.scoobySprite.transform.position = new Vector2(this.player.scoobySprite.transform.position.x + delta.x, this.player.scoobySprite.transform.position.y + delta.y);
                 }
             }
             else
             {
-                nextPos = { x: newX, y: newY };
+                nextPos = new Pos{ x= newX, y= newY };
             }
             this.player.initMove(pos, nextPos);
 
@@ -601,12 +595,12 @@ public class CC_Game
         }
         else
         {
-            const lastPos = this.player.getPosition();
-            const nextPos = { x: newX, y: newY };
+            Pos lastPos = this.player.getPosition();
+            Pos nextPos = new Pos{ x= newX, y= newY };
         this.player.initMove(lastPos, nextPos);
     }
 
-    const nextFrame = this.player.frameOfAnimation + 1;
+    int nextFrame = this.player.frameOfAnimation + 1;
     this.player.frameOfAnimation =
       nextFrame > this.player.getAnimationFrameCount()? 1 : nextFrame;
 
@@ -624,7 +618,8 @@ public class CC_Game
     this.player.refreshTexture();
   }
 
-    }
+    
+/*
     public void Update()
     {
         private update(delta: number) {
@@ -822,7 +817,7 @@ public class CC_Game
 
         this.introScreen.init(this);
     }
-    //
+    
     private void initObjects()
     {
        
@@ -1003,7 +998,7 @@ public class CC_Game
 
         
 }
-public void setFilmLoopObjects()
+    public void setFilmLoopObjects()
     {
         foreach(var obj in gameObjects)
         {
@@ -1120,7 +1115,14 @@ public void setFilmLoopObjects()
         float newY = pos.y + dy * obj.speed;
         return new Pos(newX, newY);
  
-  }
+    }
+    private void removeGameObject(CC_GameObject obj)
+    {
+        
+        int index = this.gameObjects.FindIndex((o) => o == obj);
+        this.gameObjects.RemoveAt(index);
+        GameObject.Destroy(obj.sprite);
+    }
     private bool canMoveGameObject(CC_GameObject gameObj, Pos toPos)
     {
         CC_Types.Rect newRect = new CC_Types.Rect
@@ -1139,5 +1141,16 @@ public void setFilmLoopObjects()
             return false;
         }
         return true;
+    }
+    private void resetMovableObjects(string mapName)
+    {
+        this.gameObjects
+          .FindAll(
+            (obj) =>
+              obj.data.move.COND == GameObjectMoveCond.PUSH &&
+              obj.mapName == mapName &&
+              (obj.posX != obj.originalPosX || obj.posY != obj.originalPosY)
+          )
+          .ForEach((obj) => obj.setPosition(obj.originalPosX, obj.originalPosY));
     }
 }
