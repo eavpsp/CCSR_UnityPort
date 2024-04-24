@@ -57,7 +57,8 @@ public class CC_Game
          : EngineType.CCSR;
         this.introScreen = new CC_Intro(episode);
         this.script = new CC_Episode1(this);
-        EngineManager.instance.tickEvent.AddListener(Update);
+     
+
         this.sign = new CC_Sign(this, this.engineType);
         this.inventory = new CC_Inventory.GameInventory(this, this.engineType);
         this.camera = new CC_Camera(this);
@@ -124,30 +125,29 @@ public class CC_Game
             if (obj.moveDirection == -1)
             {
                 obj.speed = 4;
-                obj.moveDirection = randBetween(0, CC_GameObject.MOVE_DIRECTIONS.Length - 1);
+                obj.moveDirection = randBetween(0, CC_GameObject.MOVE_DIRECTIONS.Count - 1);
             }
 
             // If we have reached our destination
             if (obj.posX == obj.movePos.x && obj.posY == obj.movePos.y)
             {
                 float i = obj.moveDirection + 1;
-                obj.moveDirection = i >= CC_GameObject.MOVE_DIRECTIONS.Length ? 0 : i;
+                obj.moveDirection = i >= CC_GameObject.MOVE_DIRECTIONS.Count ? 0 : i;
                 CC_Types.Rect bounds = obj.getMoveBounds();
                 float dx =
                   randBetween(0, Mathf.Floor(bounds.width / obj.speed) * obj.speed);
                 float dy =
                   randBetween(0, Mathf.Floor(bounds.width / obj.speed) * obj.speed);
                 Pos movePos = new Pos
-                (
-                      obj.posX + CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection,0] * dx,
-                      obj.posY + CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection, 1] * dy
-                );
+                (obj.posX + CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection][0] * dx,
+                  obj.posY + CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection][1] * dy
+                ); 
             obj.movePos = movePos;
         } else
         {
                 // We are not where we want to be, try to step forward.
-                int dx = CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection, 0];
-                int dy = CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection, 1];
+                int dx = CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection][0];
+                int dy = CC_GameObject.MOVE_DIRECTIONS[(int)obj.moveDirection][1];
                 CC_Types.Rect bounds = obj.getMoveBounds();
                 Pos nextPos = this.posAfterDeltaMove(obj, dx, dy);
                 CC_Types.Rect nextRect = new CC_Types.Rect { x = nextPos.x, y = nextPos.y, width = obj.width, height = obj.height};
@@ -191,7 +191,6 @@ public class CC_Game
 
         
     }
-    //TODO - update
     
     public void movePlayer(float dx, float dy)
     {
@@ -220,9 +219,9 @@ public class CC_Game
             //  supposed to change and it's not a 32x32 size
             CC_Types.Rect newPlayerRect = this.player.getCollisionRectAtPoint(newX, newY);
 
-            if (!CC_Collision.rectAinRectB(newPlayerRect, this.worldRect!))
+            if (!CC_Collision.rectAinRectB(newPlayerRect, this.worldRect))
             {
-                return;
+               
             }
 
             CC_GameObject collisionObject = this.gameObjects.Find(
@@ -232,22 +231,22 @@ public class CC_Game
             if (collisionObject == null)
             {
                 Debug.Log("No game object was found where you tried to walk!");
-                return;
+                
             }
 
-            // Determine if this object has a message to show.
-            GameObjectMessage[] messages = collisionObject.data.message;
-
-            // TODO: possibly try to clean up this mess in the future
-            // It just looks sloppy, but I wrote it this way to match
-            // the logic of the original game.
+        // Determine if this object has a message to show.
+        bool inWater = false;
+        if (collisionObject != null)
+        {
+            GameObjectMessage[] messages = collisionObject.data.message.ToArray();
             string message = "";
 
             if (messages.Length > 0)
             {
                 Debug.Log(collisionObject);
                 // Find the message which is relavant to our player's state
-                foreach(GameObjectMessage m in messages) {
+                foreach (GameObjectMessage m in messages)
+                {
                     if (m.plrAct == "" && m.plrObj == "")
                     {
                         message = m.text;
@@ -289,7 +288,7 @@ public class CC_Game
                   collisionObject.data.item.type == GameObjectType.ITEM.GetDescription()
                 )
                 {
-                    this.sign. showCharacterMessage(collisionObject.member, message);
+                    this.sign.showCharacterMessage(collisionObject.member, message);
                 }
                 else
                 {
@@ -306,7 +305,8 @@ public class CC_Game
 
             if (conds.Length > 0)
             {
-                foreach(GameObjectCond c in conds) {
+                foreach (GameObjectCond c in conds)
+                {
                     condIndex++;
                     if (c.hasObj == "" && c.hasAct == "")
                     {
@@ -364,15 +364,15 @@ public class CC_Game
                     {
                         if (c.giveObj == "nobats")
                         {
-                           // this.sound.soundBank["bunch_o_bats"];
+                            // this.sound.soundBank["bunch_o_bats"];
                         }
                     }
-                UnityEvent onCloseEvent = new UnityEvent();
-                onCloseEvent.AddListener(delegate
-                {
-                    this.inventory.openInventory(c.giveObj);
-                });
-                this.sign.SetOnClose(onCloseEvent);
+                    UnityEvent onCloseEvent = new UnityEvent();
+                    onCloseEvent.AddListener(delegate
+                    {
+                        this.inventory.openInventory(c.giveObj);
+                    });
+                    this.sign.SetOnClose(onCloseEvent);
                 }
                 if (c.giveAct != "" && !this.inventory.has(c.giveAct))
                 {
@@ -380,9 +380,9 @@ public class CC_Game
                 }
             }
 
-            bool inWater = false;
-
             
+
+
             string name = collisionObject.data.item.name;
             if (name != "" && !name.Contains("="))
             {
@@ -418,97 +418,112 @@ public class CC_Game
 
                                 if (futureCollision != null)
                                 {
-                                    return;
+                                    break;
                                 }
 
-                                Pos lastPos = new Pos{
-                                      x= collisionObject.posX,
-                                      y=collisionObject.posY,
-                                    };
-                            collisionObject.initMove(lastPos, toPos);
-                            this.movingObjects.Add(collisionObject);
-                            this.sound.SetSFXClip(this.sound.push);
-                            EngineManager.instance.SFX.Play();
-                            break;
-                        }
-                    }
-                    if (collisionObject.data.item.type == GameObjectType.WALL.GetDescription() && message != "")
-                    {
-                        if (this.engineType == EngineType.CCSR)
-                        {
-                            this.sound.once(this.sound.bump);
-                        }
-                        else if (this.engineType == EngineType.Scooby)
-                        {
-                            string[] bumpSounds = new string[] {"bump", "ruh_oh", "", ""};
-                            int randIndex = (int)Mathf.Floor(UnityEngine.Random.Range(0,1) * bumpSounds.Length);
-                            // console.log(randIndex)
-                            string randSound = bumpSounds[randIndex];
-                            if (randSound != string.Empty)
-                            {
-                                if (!EngineManager.instance.SFX.isPlaying)
+                                Pos lastPos = new Pos
                                 {
-                                    this.sound.dynamicSoundOnce(randSound);
-                                }
+                                    x = collisionObject.posX,
+                                    y = collisionObject.posY,
+                                };
+                                collisionObject.initMove(lastPos, toPos);
+                                this.movingObjects.Add(collisionObject);
+                                this.sound.SetSFXClip(this.sound.push);
+                                EngineManager.instance.SFX.Play();
+                                break;
                             }
-                            this.sound.dynamicSoundOnce("bloop");
                         }
+                        if (collisionObject.data.item.type == GameObjectType.WALL.GetDescription() && message != "")
+                        {
+                            if (this.engineType == EngineType.CCSR)
+                            {
+                                this.sound.once(this.sound.bump);
+                            }
+                            else if (this.engineType == EngineType.Scooby)
+                            {
+                                string[] bumpSounds = new string[] { "bump", "ruh_oh", "", "" };
+                                int randIndex = (int)Mathf.Floor(UnityEngine.Random.Range(0, 1) * bumpSounds.Length);
+                                // console.log(randIndex)
+                                string randSound = bumpSounds[randIndex];
+                                if (randSound != string.Empty)
+                                {
+                                    if (!EngineManager.instance.SFX.isPlaying)
+                                    {
+                                        this.sound.dynamicSoundOnce(randSound);
+                                    }
+                                }
+                                this.sound.dynamicSoundOnce("bloop");
+                            }
+                            break;
+
+                        }
+                        break;
+
                     }
-                    return;
-            }
-      case "ITEM": {
-                this.removeGameObject(collisionObject);
-                break;
-            }
-      case "WATER": {
-                // only allow water travel if you have a boat
-                if (!this.inventory.has("scuba"))
-                {
-                    this.sign.showMessage(this.gameData!.walkIntoWater);
-                    return;
-                }
-                inWater = true;
-                break;
-            }
-      case "DOOR": {
-                string[] data = collisionObject.data.item.name.Split('=');
-                string action = data[0].ToUpper();
-
-                this.sound.SetSFXClip(this.sound.chimes);
-                    EngineManager.instance.SFX.Play();
-
-                switch (action)
-                {
-                    case "FRAME":
+                case "ITEM":
+                    {
+                        this.removeGameObject(collisionObject);
+                        break;
+                    }
+                case "WATER":
+                    {
+                        // only allow water travel if you have a boat
+                        if (!this.inventory.has("scuba"))
                         {
-                            this.playScene(data[1]);
-                            return;
+                            this.sign.showMessage(this.gameData.walkIntoWater);
+
                         }
-                    case "ROOM":
+                        inWater = true;
+                        break;
+                    }
+                case "DOOR":
+                    {
+                        string[] data = collisionObject.data.item.name.Split('=');
+                        string action = data[0].ToUpper();
+
+                        this.sound.SetSFXClip(this.sound.chimes);
+                        EngineManager.instance.SFX.Play();
+
+                        switch (action)
                         {
-                            string coordsString = data[1];
-                            int[] coords = coordsString.Split('.').Select((x) => int.Parse(x)).ToArray();
-                            string mapX = coords[0].ToString().PadLeft(2, '0');
-                            string mapY = coords[1].ToString().PadLeft(2, '0');
-                            string map = mapX + mapY;
-                            int x = coords[2];
-                            int y = coords[3];
-                            this.script.onNewMap(map);
-                            this.setMap(map);
-                            this.player.setMapAndPosition(map, x, y);
-                            this.camera.snapCameraToMap(map);
+                            case "FRAME":
+                                {
+                                    this.playScene(data[1]);
+                                    break;
+                                }
+                            case "ROOM":
+                                {
+                                    string coordsString = data[1];
+                                    int[] coords = coordsString.Split('.').Select((dat) => int.Parse(dat)).ToArray();
+                                    string mapX = coords[0].ToString().PadLeft(2, '0');
+                                    string mapY = coords[1].ToString().PadLeft(2, '0');
+                                    string map = mapX + mapY;
+                                    int x = coords[2];
+                                    int y = coords[3];
+                                    this.script.onNewMap(map);
+                                    this.setMap(map);
+                                    this.player.setMapAndPosition(map, x, y);
+                                    this.camera.snapCameraToMap(map);
+                                    break;
 
-                            return;
+
+                                }
                         }
-                }
 
-                Debug.Log(data);
-                break;
+                        Debug.Log(data);
+                        break;
+                    }
+                default:
+                    Debug.Log(collisionObject);
+                    break;
             }
-            default:
-                Debug.Log(collisionObject);
-            break;
+
+
         }
+
+        // TODO: possibly try to clean up this mess in the future
+        // It just looks sloppy, but I wrote it this way to match
+        // the logic of the original game.
 
         PlayerState newState = inWater ? PlayerState.BOAT : PlayerState.NORMAL;
         this.player.state = newState;
@@ -618,9 +633,8 @@ public class CC_Game
     this.player.refreshTexture();
   }
 
-    
 
-    public void Update(int delta)
+    public void Update(float delta)
     {
        
             int now = DateTime.Now.Millisecond;
@@ -639,7 +653,7 @@ public class CC_Game
                         scene.nextFrame(now);
                     }
                 }
-                return;
+               
             }
 
         
@@ -660,7 +674,10 @@ public class CC_Game
                             float percentage = completed / this.MSperTick;
                             float dx = percentage * (obj.nextPos.x - obj.lastPos.x);
                             float dy = percentage * (obj.nextPos.y - obj.lastPos.y);
-                            (obj as CC_GameObject).sprite.SetSpritePos(new Vector2(obj.lastPos.x + dx, obj.lastPos.y + dy));
+                            if ((obj as CC_GameObject) != null)
+                            {
+                                (obj as CC_GameObject).sprite.SetSpritePos(new Vector2(obj.lastPos.x + dx, obj.lastPos.y + dy));
+                            }
                         }
                     }
                 }
@@ -673,13 +690,17 @@ public class CC_Game
                     this.camera.centerCameraOnPlayer();
                 }
 
-                return;
+                
             }
 
             foreach(MovableGameObject obj in moveables) {
                 if (obj.inWalkingAnimation)
                 {
-                    (obj  as CC_GameObject).endMove();
+                    if ((obj as CC_GameObject) != null)
+                    {
+                        (obj as CC_GameObject).endMove();
+
+                    }
                 }
             }
 
@@ -713,7 +734,7 @@ public class CC_Game
                 {
                     this.introScreen.close(this);
                 }
-                return;
+                
             }
 
             if (this.sign.isOpen() || this.inventory.isOpen())
@@ -735,10 +756,7 @@ public class CC_Game
             }
             else
             {
-                if (
-                  !this.player.inWalkingAnimation &&
-                  this.player.status == PlayerStatus.MOVE
-                )
+                if (!this.player.inWalkingAnimation && this.player.status == PlayerStatus.MOVE)
                 {
                     float left =
                       Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A) || Input.GetAxis("Horizontal") == -1 ? -1 : 0;
@@ -748,18 +766,16 @@ public class CC_Game
                         Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W) || Input.GetAxis("Vertical") == 1 ? -1 : 0;
                     float down =
                         Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S) || Input.GetAxis("Vertical") == -1 ? 1 : 0;
-                    this.movePlayer(left + right, up + down);
+                    
+                        this.movePlayer(left + right, up + down);
                 }
                 if (Input.GetKey(KeyCode.Return))
                 {
                     this.inventory.openInventory();
                 }
             }
-           
-        
 
     }
-
 
     public string getMap()
     {
@@ -831,10 +847,10 @@ public class CC_Game
                area = EngineManager.instance.GetGameMapAreaJson(x);
             }
         });
-        List<GameMessages> messages = new List<GameMessages>();
+        List<GameMes> messages = new List<GameMes>();
         EngineManager.instance.assets.ForEach((x) =>
         {
-            if (x.name == "messagaes")
+            if (x.name == "message")
             {
                 messages = EngineManager.instance.GetGameMessages(x);
             }
@@ -857,24 +873,29 @@ public class CC_Game
                 }
 
                 // Replace the message text with the translation for the chosen language
-               /* if (messages != null)
+                if (messages.Count > 0)
                 {
                     foreach(GameObjectMessage msg in obj.data.message) {
-                        byte[] msgBytes = Encoding.UTF8.GetBytes(msg.text);
-                        byte[] hashBytes;
-                        string msgHash = "";
+
+                        string hashHex = "";
                         using (SHA256 sha256 = SHA256.Create())
                         {
-                            hashBytes = sha256.ComputeHash(msgBytes);
-                        };
-                         msgHash = BitConverter.ToString(hashBytes).Replace("-", "").Substring(0, messages.message.Length);
-                         msgHash = BitConverter.ToString(hashBytes).Replace("-", "").Substring(0, messages.message.Length);
+                            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(msg.text));
+                            hashHex = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                            if (hashHex != "")
+                            {
+                                hashHex.Substring(0, messages[0].ToString().Length);
 
-                          msg.text = messages.message;
+                            }
+                        }
+                       
+                        Debug.Log("HASH: "+ hashHex);
+                        Debug.Log("MSG: "+ msg.text);
+                        msg.text = messages.Find(x => x[hashHex] == x[hashHex]).ToString();
                         
                       
                     }
-                }*/
+                }
 
                 CC_GameObject gameObject = new CC_GameObject(obj, area.name);
                 this.gameObjects.Add(gameObject);

@@ -73,18 +73,22 @@ public class EngineManager : MonoBehaviour
     {
         return new GameObject(name).AddComponent<CC_SpriteUI>();
     }
-    public List<GameMessages> GetGameMessages(AssetData asset)
+    public List<GameMes> GetGameMessages(AssetData asset)
     {
-        List<GameMessages> data = new List<GameMessages>();
         if (asset != null)
         {
+            List<GameMes> data = new List<GameMes>();
+
             TextAsset JSON = new TextAsset();
             JSON = Resources.Load<TextAsset>(asset.path);
             string jsonString = JSON.text;
             JsonUtility.FromJsonOverwrite(jsonString, data);
-        }
+            Debug.Log("Messages Loaded");
+            Debug.Log(data.Count);
+            return data;
 
-        return data;
+        }
+        return null;
     }
     public GameData GetGameData(AssetData asset)
     {
@@ -126,7 +130,7 @@ public class EngineManager : MonoBehaviour
                  new AssetData
             {
                 name = "message",
-                path = root + lang + "/message"
+                path = root + lang + "/messages"
             },
         };
         if (lang != "en")
@@ -139,9 +143,19 @@ public class EngineManager : MonoBehaviour
         }
         doneCallBack();
     }
+    [Serializable]
+    public class TestObj
+    {
+       public List<GameMes> data = new List<GameMes>();
+    }
+
     void Start()
     {
-       
+        TestObj data = new TestObj();
+        data.data.Add(new GameMes());
+        data.data[0]["data"] = "tat";
+        Debug.Log(JsonUtility.ToJson(data.data));
+        Debug.Log(data.data[0]["data"]);
         episode = "1";
         currentGame = new CC_Game(episode, "en");
     }
@@ -149,8 +163,12 @@ public class EngineManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        tickEvent.Invoke();
-       
+        
+            currentGame.Update(Time.deltaTime);
+           //Debug.Log(currentGame == null);
+
+        
+
         //Run Controls Callbacks here
     }
     //

@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System.ComponentModel;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.IO;
 using static CC_Inventory;
 public static class CC_Types 
 {
@@ -49,12 +52,19 @@ public static class CC_Types
         public GameMessages scene;
         public List<GameInventoryItemData> inventory = new List<GameInventoryItemData>();
     }
-    
 
-    public class GameMessages
+    [Serializable]
+    public abstract class GameMessages
     {
-        public string message;
+        public abstract string this[string key] { get; set; }
     }
+    [Serializable]
+    public class GameMes : GameMessages
+    {
+        public string keyData;
+        public override string this[string key] { get => keyData; set => keyData = value; }
+    }
+
     public delegate void setPosition(int x, int y);
     public delegate void initMove(Pos fromPos, Pos toPos);
     public delegate void endMove();
@@ -162,7 +172,7 @@ public static class CC_Types
     {
         public GameObjectItem item;
         public GameObjectMove move;
-        public GameObjectMessage[] message;
+        public List<GameObjectMessage> message = new List<GameObjectMessage>();
     }
     [Serializable]
 
@@ -232,3 +242,5 @@ public static class CC_Types
     }
 
 }
+
+

@@ -7,12 +7,12 @@ using static CC_Types;
 [Serializable]
 public class CC_GameObject : IGameObject, MovableGameObject
 {
-    public static readonly int[,] MOVE_DIRECTIONS =
+    public static readonly List<int[]> MOVE_DIRECTIONS = new List<int[]>
     {
-        {0, -1},
-        {-1, 0},
-        {0, 1},
-        {1, 0}
+        new int[] { 0, -1 },
+        new int[] { -1, 0 },
+        new int[] { 0, 1 },
+        new int[] { 1, 0 }
     };
     private string _member;
     public string member {

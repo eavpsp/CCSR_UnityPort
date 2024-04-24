@@ -183,7 +183,6 @@ public class CC_Camera
         }
 
         CC_Types.Pos pos = this.getMapCameraXY(mapName);
-        Debug.Log("SNAP TO "+ mapName+ " " +pos.x + " "+pos.y);
         this.setCamera(pos.x, pos.y);
     }
     public void setCameraBounds(string mapTopLeft, string mapBottomRight)
@@ -205,8 +204,6 @@ public class CC_Camera
 
         float x = (-data.x * mainCam.rect.width);
         float y = (-data.y * mainCam.rect.height);
-        Debug.Log(x);
-        Debug.Log(y);
         int w = (Screen.width);
         int h = (Screen.height);
 
