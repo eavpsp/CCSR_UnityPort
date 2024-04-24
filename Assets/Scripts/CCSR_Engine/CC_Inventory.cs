@@ -122,7 +122,7 @@ public static class CC_Inventory
         {
             return this.isInventoryOpen;
         }
-        public void openInventory(string selectItem)
+        public void openInventory(string selectItem = "")
         {
 
             // Scooby games don't have a UI for the inventory

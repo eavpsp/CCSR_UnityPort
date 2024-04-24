@@ -57,7 +57,7 @@ public class CC_Game
          : EngineType.CCSR;
         this.introScreen = new CC_Intro(episode);
         this.script = new CC_Episode1(this);
-        //EngineManager.instance.tickEvent.AddListener(Update);
+        EngineManager.instance.tickEvent.AddListener(Update);
         this.sign = new CC_Sign(this, this.engineType);
         this.inventory = new CC_Inventory.GameInventory(this, this.engineType);
         this.camera = new CC_Camera(this);
@@ -191,7 +191,7 @@ public class CC_Game
 
         
     }
-    //TODO - Add player movement and update
+    //TODO - update
     
     public void movePlayer(float dx, float dy)
     {
@@ -619,14 +619,14 @@ public class CC_Game
   }
 
     
-/*
-    public void Update()
-    {
-        private update(delta: number) {
-            const now = Date.now();
-            const scene = this.currentScene;
 
-            if (scene)
+    public void Update(int delta)
+    {
+       
+            int now = DateTime.Now.Millisecond;
+            CC_Scene.GameScene scene = this.currentScene;
+
+            if (scene != null)
             {
                 if (scene.isPlaying())
                 {
@@ -642,22 +642,25 @@ public class CC_Game
                 return;
             }
 
-            const moveables: MovableGameObject[] = [this.player, ...this.movingObjects];
-
-            if (now < this.lastUpdate + this.MSperTick)
+        
+        var moveablesList = new List<MovableGameObject>();
+        moveablesList.Add(this.player);
+        moveablesList.AddRange(this.movingObjects.FindAll(x => x.isStatic() == false));
+        MovableGameObject[] moveables = moveablesList.ToArray();
+        if (now < this.lastUpdate + this.MSperTick)
             {
                 this.camera.tick();
                 if (this.smoothAnimations)
                 {
-                    for (const obj of moveables) {
+                    foreach(MovableGameObject obj in moveables) {
                         if (obj.inWalkingAnimation)
                         {
-                            const endTime = obj.walkAnimStartMS + this.MSperTick;
-                            const completed = this.MSperTick - (endTime - now);
-                            const percentage = completed / this.MSperTick;
-                            const dx = percentage * (obj.nextPos.x - obj.lastPos.x);
-                            const dy = percentage * (obj.nextPos.y - obj.lastPos.y);
-                            obj.setPosition(obj.lastPos.x + dx, obj.lastPos.y + dy);
+                            float endTime = obj.walkAnimStartMS + this.MSperTick;
+                            float completed = this.MSperTick - (endTime - now);
+                            float percentage = completed / this.MSperTick;
+                            float dx = percentage * (obj.nextPos.x - obj.lastPos.x);
+                            float dy = percentage * (obj.nextPos.y - obj.lastPos.y);
+                            (obj as CC_GameObject).sprite.SetSpritePos(new Vector2(obj.lastPos.x + dx, obj.lastPos.y + dy));
                         }
                     }
                 }
@@ -673,25 +676,25 @@ public class CC_Game
                 return;
             }
 
-            for (const obj of moveables) {
+            foreach(MovableGameObject obj in moveables) {
                 if (obj.inWalkingAnimation)
                 {
-                    obj.endMove();
+                    (obj  as CC_GameObject).endMove();
                 }
             }
 
             // Remove any non auto-walking entities
-            this.movingObjects = this.movingObjects.filter(
+            this.movingObjects = this.movingObjects.FindAll(
               (obj) => obj.data.move.COND == GameObjectMoveCond.AUTO
             );
 
-            const pushers = this.movingObjects.filter(
+            List<CC_GameObject> pushers = this.movingObjects.FindAll(
               (o) => o.data.move.COND == GameObjectMoveCond.PUSH
             );
 
-            if (pushers.length == 0)
+            if (pushers.Count == 0)
             {
-                this.sound.push.pause();
+                //this.sound.push.pause();
             }
 
             this.lastUpdate = now;
@@ -706,7 +709,7 @@ public class CC_Game
 
             if (this.introScreen.inIntro)
             {
-                if (this.keyPressed(Key.ENTER))
+                if (Input.GetKey(KeyCode.Return))
                 {
                     this.introScreen.close(this);
                 }
@@ -717,14 +720,14 @@ public class CC_Game
             {
                 if (this.sign.isOpen())
                 {
-                    if (this.keyPressed(Key.ENTER))
+                    if (Input.GetKey(KeyCode.Return))
                     {
                         this.sign.closeMessage();
                     }
                 }
                 if (this.inventory.isOpen())
                 {
-                    if (this.keyPressed(Key.ENTER))
+                    if (Input.GetKey(KeyCode.Return))
                     {
                         this.inventory.closeInventory();
                     }
@@ -737,26 +740,26 @@ public class CC_Game
                   this.player.status == PlayerStatus.MOVE
                 )
                 {
-                    const left =
-                      this.keyPressed(Key.LEFT) || this.keyPressed(Key.A) ? -1 : 0;
-                    const right =
-                      this.keyPressed(Key.RIGHT) || this.keyPressed(Key.D) ? 1 : 0;
-                    const up = this.keyPressed(Key.UP) || this.keyPressed(Key.W) ? -1 : 0;
-                    const down =
-                      this.keyPressed(Key.DOWN) || this.keyPressed(Key.S) ? 1 : 0;
+                    float left =
+                      Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A) || Input.GetAxis("Horizontal") == -1 ? -1 : 0;
+                    float right =
+                       Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D) || Input.GetAxis("Horizontal") == 1  ? 1 : 0;
+                    float up =
+                        Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W) || Input.GetAxis("Vertical") == 1 ? -1 : 0;
+                    float down =
+                        Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S) || Input.GetAxis("Vertical") == -1 ? 1 : 0;
                     this.movePlayer(left + right, up + down);
                 }
-                if (this.keyPressed(Key.ENTER))
+                if (Input.GetKey(KeyCode.Return))
                 {
                     this.inventory.openInventory();
                 }
             }
-            this.keysPressed.delete(Key.ENTER);
-            this.keysPressed.delete(Key.SPACE);
-        }
+           
+        
 
     }
-*/
+
 
     public string getMap()
     {
